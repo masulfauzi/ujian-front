@@ -4,7 +4,9 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-const showNavbar = computed(() => route.path !== '/login')
+const showNavbar = computed(() => {
+  return route.path !== '/login' && route.path !== '/dashboard'
+})
 </script>
 
 <template>

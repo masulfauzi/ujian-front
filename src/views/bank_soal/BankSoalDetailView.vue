@@ -43,6 +43,7 @@ const detailCatalog = {
 }
 
 const selectedDetail = computed(() => detailCatalog[route.params.id] ?? detailCatalog[1])
+const bankSoalId = computed(() => String(route.params.id ?? '1'))
 
 const questions = [
     {
@@ -94,12 +95,12 @@ const statusClass = computed(() => {
                             }}</h1>
                         <p class="text-sm text-slate-500 md:text-base">{{ selectedDetail.description }}</p>
                     </div>
-                    <button
+                    <RouterLink :to="`/bank-soal/${bankSoalId}/tambah-soal`"
                         class="inline-flex items-center gap-2 rounded-xl bg-emerald-100 px-5 py-3 text-sm font-bold text-emerald-700 transition hover:brightness-95"
                         type="button">
                         <span>＋</span>
                         <span>Tambah Soal Baru</span>
-                    </button>
+                    </RouterLink>
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-3">

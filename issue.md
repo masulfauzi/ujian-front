@@ -1,93 +1,93 @@
-# Planning: Halaman Tambah Bank Soal (Tailwind + Global Layout)
+# Issue: Implementasi Halaman Tambah Soal Baru (Bank Soal)
+
+## Ringkasan
+Buat halaman baru untuk menambahkan soal, lalu hubungkan dari tombol **Tambah Soal Baru** di halaman detail bank soal. Halaman baru harus diadaptasi dari `template/code.html`, menggunakan Tailwind, dan tetap memakai layout global aplikasi (sidebar + header).
 
 ## Tujuan
-Menambahkan alur dari tombol **Tambah Bank Soal** pada halaman Bank Soal agar membuka halaman baru untuk membuat bank soal, dengan tampilan yang diadaptasi dari `template/code.html` menggunakan Tailwind.
+- User bisa membuka halaman tambah soal dari detail bank soal.
+- UI halaman tambah soal mengikuti referensi template.
+- Tidak ada duplikasi layout global di level halaman.
 
-Dokumen ini ditujukan agar implementasi dapat dilakukan oleh junior programmer atau AI model yang lebih murah.
+## Scope
+### In Scope
+- Menambah route halaman tambah soal.
+- Menghubungkan tombol navigasi dari halaman detail bank soal.
+- Membuat view baru untuk form tambah soal (UI only).
+- Implementasi styling dengan Tailwind.
 
-## Requirement Utama
-- Pada halaman Bank Soal, tombol **Tambah Bank Soal** harus dapat diklik.
-- Klik tombol tersebut membuka halaman baru pembuatan bank soal.
-- Halaman baru mengikuti tampilan dari `template/code.html`.
-- Halaman baru tetap menampilkan **global sidebar** dan **global header** yang sudah ada di aplikasi.
-- Implementasi tampilan menggunakan Tailwind.
+### Out of Scope (jangan dikerjakan di issue ini)
+- Integrasi API submit soal.
+- Validasi form kompleks.
+- Penyimpanan data permanen.
+- Fitur edit/hapus soal.
 
-## Batasan Scope
-- Fokus pada routing, halaman form tambah bank soal, dan integrasi layout global.
-- Tidak perlu implementasi submit ke backend pada tahap ini.
-- Tidak menambah state management kompleks atau validasi backend.
-
-## Referensi Implementasi
+## Referensi File
 - Template UI: `template/code.html`
-- Halaman asal tombol: `src/views/bank_soal/BankSoalListView.vue`
-- Routing modular Bank Soal: `src/router/modules/bankSoal.js`
-- Global layout: `src/App.vue` (sidebar + header)
+- Halaman detail bank soal: `src/views/bank_soal/BankSoalDetailView.vue`
+- Router bank soal: `src/router/modules/bankSoal.js`
+- Global shell/layout: `src/App.vue`
 
-## Tahapan Implementasi
+## Tahapan Implementasi (untuk junior/AI model murah)
 
-### 1) Tambahkan route baru untuk halaman tambah bank soal
-- Tambahkan route baru pada modul Bank Soal (contoh: `/bank-soal/tambah`).
-- Tetap gunakan pola modular route yang sudah berlaku.
+### 1. Tambah route baru
+1) Buka `src/router/modules/bankSoal.js`.
+2) Tambahkan route baru untuk halaman tambah soal, contoh:
+   - path: `/bank-soal/:id/tambah-soal`
+   - name: `bank-soal-question-create`
+   - component: view baru (dibuat di langkah 3).
+3) Pastikan route mengikuti pola modular route yang sudah ada.
 
-Output:
-- Route halaman tambah bank soal tersedia dan bisa diakses.
+**Output langkah ini:** URL halaman tambah soal bisa diakses langsung.
 
----
+### 2. Hubungkan tombol “Tambah Soal Baru”
+1) Buka `src/views/bank_soal/BankSoalDetailView.vue`.
+2) Cari tombol **Tambah Soal Baru**.
+3) Ubah tombol agar navigasi ke route baru (pakai `RouterLink` atau `router.push`).
+4) Pastikan parameter `id` bank soal ikut dikirim saat pindah halaman.
 
-### 2) Hubungkan tombol “Tambah Bank Soal” ke route baru
-- Ubah tombol tambah pada `BankSoalListView.vue` agar melakukan navigasi ke route tambah bank soal.
-- Gunakan `RouterLink` atau `router.push` agar konsisten dengan Vue Router.
+**Output langkah ini:** Klik tombol di halaman detail membuka halaman tambah soal sesuai bank soal aktif.
 
-Output:
-- Klik tombol langsung membawa user ke halaman tambah bank soal.
+### 3. Buat view halaman tambah soal
+1) Buat file baru, contoh: `src/views/bank_soal/BankSoalQuestionCreateView.vue`.
+2) Ambil struktur visual dari `template/code.html`, lalu adaptasi ke konteks “Tambah Soal”.
+3) Minimal isi halaman:
+   - tombol kembali ke detail bank soal,
+   - judul halaman,
+   - input pertanyaan,
+   - opsi jawaban A–E,
+   - pemilihan kunci jawaban,
+   - tombol aksi (Batal, Simpan).
+4) Gunakan Tailwind class, tanpa CSS custom baru kecuali benar-benar perlu.
 
----
+**Output langkah ini:** UI halaman tambah soal tampil lengkap sesuai kebutuhan baseline.
 
-### 3) Buat view baru untuk form tambah bank soal
-- Buat file view baru di modul bank soal (misalnya `src/views/bank_soal/BankSoalCreateView.vue`).
-- Adaptasi struktur UI dari `template/code.html`:
-  - judul halaman + breadcrumb,
-  - form card,
-  - field informasi dasar,
-  - tombol aksi (batal/simpan),
-  - blok info/tips tambahan.
-- Terapkan styling dengan class Tailwind.
+### 4. Jaga global layout tetap konsisten
+1) Jangan copy-paste sidebar/header ke view baru.
+2) Pastikan view baru hanya mengisi area konten utama.
+3) Cek spacing/padding agar konsisten dengan halaman lain.
 
-Output:
-- Halaman tambah bank soal tampil sesuai referensi utama template.
+**Output langkah ini:** Halaman baru tetap berada dalam shell global aplikasi (sidebar + header tetap tampil).
 
----
+### 5. Validasi dasar sebelum dianggap selesai
+1) Jalankan aplikasi.
+2) Uji alur:
+   - buka detail bank soal,
+   - klik tombol **Tambah Soal Baru**,
+   - pastikan berpindah ke halaman baru,
+   - pastikan sidebar + header global tetap ada.
+3) Jalankan build check: `npm run build`.
 
-### 4) Pastikan global sidebar dan global header tetap tampil
-- Jangan menambahkan sidebar/header lokal baru di view tambah bank soal.
-- Gunakan layout global yang sudah ada di `App.vue`.
-- Sesuaikan spacing konten agar tidak bertabrakan dengan sidebar/header global.
+**Output langkah ini:** Fitur baseline siap untuk tahap integrasi backend berikutnya.
 
-Output:
-- Halaman baru menyatu dengan layout global aplikasi.
+## Acceptance Criteria
+- [ ] Ada route baru untuk halaman tambah soal.
+- [ ] Tombol **Tambah Soal Baru** di halaman detail bank soal mengarah ke route baru.
+- [ ] Halaman tambah soal dibuat sebagai view baru.
+- [ ] Tampilan mengadaptasi `template/code.html` dan memakai Tailwind.
+- [ ] Sidebar + header global tetap tampil (tanpa duplikasi di view).
+- [ ] Build berhasil tanpa error.
 
----
-
-### 5) Validasi fungsional dasar
-Lakukan pengecekan minimum:
-- Dari halaman Bank Soal, tombol tambah bisa membuka halaman tambah bank soal.
-- Halaman baru menampilkan layout global (sidebar + header).
-- Tampilan form mengikuti struktur template secara visual utama.
-- Build project berhasil tanpa error.
-
-Output:
-- Fitur siap dipakai sebagai baseline implementasi lanjutan.
-
-## Checklist Implementasi
-- [ ] Route tambah bank soal ditambahkan di modul route Bank Soal.
-- [ ] Tombol “Tambah Bank Soal” menavigasi ke route baru.
-- [ ] View baru untuk create bank soal dibuat di folder modul Bank Soal.
-- [ ] UI halaman baru diadaptasi dari `template/code.html` dengan Tailwind.
-- [ ] Global sidebar + global header tetap digunakan (tanpa duplikasi lokal).
-- [ ] Build/check dasar berhasil.
-
-## Catatan untuk Junior Programmer / AI Model Murah
-- Kerjakan berurutan: route → tombol navigasi → halaman baru → rapikan UI.
-- Fokus pada struktur halaman dan konsistensi layout global terlebih dahulu.
-- Jika detail template terlalu kompleks, pilih versi sederhana yang tetap mirip visual.
-- Hindari menambah scope di luar task ini (API submit, validasi kompleks, integrasi backend).
+## Catatan Eksekusi
+- Kerjakan berurutan sesuai langkah 1 → 5.
+- Jangan tambah fitur di luar scope issue ini.
+- Jika ada kebingungan pada detail UI, prioritaskan struktur sederhana yang fungsional dulu (MVP), lalu rapikan.

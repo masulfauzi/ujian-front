@@ -99,7 +99,11 @@
                                         <div
                                             class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-600">
                                             ∑</div>
-                                        <span class="font-bold text-slate-900">Matematika Wajib</span>
+                                        <RouterLink
+                                            class="font-bold text-slate-900 transition-colors hover:text-sky-600"
+                                            to="/bank-soal/1">
+                                            Matematika Wajib
+                                        </RouterLink>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5"><span
@@ -124,7 +128,11 @@
                                         <div
                                             class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
                                             🧪</div>
-                                        <span class="font-bold text-slate-900">Fisika Dasar</span>
+                                        <RouterLink
+                                            class="font-bold text-slate-900 transition-colors hover:text-sky-600"
+                                            to="/bank-soal/2">
+                                            Fisika Dasar
+                                        </RouterLink>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5"><span
@@ -145,7 +153,11 @@
                                         <div
                                             class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
                                             📚</div>
-                                        <span class="font-bold text-slate-900">Bahasa Indonesia</span>
+                                        <RouterLink
+                                            class="font-bold text-slate-900 transition-colors hover:text-sky-600"
+                                            to="/bank-soal/3">
+                                            Bahasa Indonesia
+                                        </RouterLink>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5"><span
@@ -166,7 +178,11 @@
                                         <div
                                             class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
                                             🏛️</div>
-                                        <span class="font-bold text-slate-900">Sejarah Indonesia</span>
+                                        <RouterLink
+                                            class="font-bold text-slate-900 transition-colors hover:text-sky-600"
+                                            to="/bank-soal/4">
+                                            Sejarah Indonesia
+                                        </RouterLink>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5"><span
@@ -187,7 +203,11 @@
                                         <div
                                             class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
                                             🧬</div>
-                                        <span class="font-bold text-slate-900">Biologi</span>
+                                        <RouterLink
+                                            class="font-bold text-slate-900 transition-colors hover:text-sky-600"
+                                            to="/bank-soal/5">
+                                            Biologi
+                                        </RouterLink>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5"><span

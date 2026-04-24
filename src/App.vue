@@ -15,7 +15,7 @@ const dashboardMenuClass = computed(() => {
 })
 
 const bankSoalMenuClass = computed(() => {
-  const isActive = route.path === '/bank-soal'
+  const isActive = route.path.startsWith('/bank-soal')
   return isActive
     ? 'flex items-center gap-3 border-r-4 border-sky-500 bg-sky-50 px-3 py-3 font-semibold text-sky-600'
     : 'flex items-center gap-3 px-3 py-3 text-slate-500 transition hover:bg-slate-50 hover:text-sky-500'
@@ -65,19 +65,15 @@ const bankSoalMenuClass = computed(() => {
       </div>
     </aside>
 
-    <header
-      v-if="showGlobalHeader"
-      class="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white/80 px-4 backdrop-blur lg:left-64 lg:ml-64 lg:px-8"
-    >
+    <header v-if="showGlobalHeader"
+      class="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white/80 px-4 backdrop-blur lg:left-64 lg:ml-64 lg:px-8">
       <div class="flex h-full items-center justify-between">
         <div class="flex items-center gap-6">
           <span class="text-base font-semibold text-slate-800 lg:text-lg">Exam Management</span>
           <div class="hidden items-center lg:flex">
             <input
               class="w-64 rounded-full border-none bg-slate-100 px-4 py-2 text-xs outline-none ring-2 ring-transparent transition focus:ring-sky-500"
-              placeholder="Search exams, students..."
-              type="text"
-            />
+              placeholder="Search exams, students..." type="text" />
           </div>
         </div>
         <div class="flex items-center gap-3 text-sm text-slate-600">
@@ -86,8 +82,7 @@ const bankSoalMenuClass = computed(() => {
           <div class="hidden h-8 w-px bg-slate-200 md:block"></div>
           <span class="hidden font-medium text-slate-700 md:block">Sarah Wijaya</span>
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-sky-100 bg-white text-xs font-bold text-sky-700"
-          >
+            class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-sky-100 bg-white text-xs font-bold text-sky-700">
             SW
           </div>
         </div>

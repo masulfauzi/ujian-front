@@ -1,5 +1,6 @@
 import BankSoalListView from '../../views/bank_soal/BankSoalListView.vue'
 import BankSoalCreateView from '../../views/bank_soal/BankSoalCreateView.vue'
+import BankSoalDetailView from '../../views/bank_soal/BankSoalDetailView.vue'
 
 const bankSoalRoutes = [
     {
@@ -11,6 +12,11 @@ const bankSoalRoutes = [
         path: '/bank-soal/tambah',
         name: 'bank-soal-create',
         component: BankSoalCreateView,
+    },
+    {
+        path: '/bank-soal/:id',
+        name: 'bank-soal-detail',
+        component: BankSoalDetailView,
     },
 ]
 

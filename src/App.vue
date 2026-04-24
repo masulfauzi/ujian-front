@@ -20,6 +20,13 @@ const bankSoalMenuClass = computed(() => {
     ? 'flex items-center gap-3 border-r-4 border-sky-500 bg-sky-50 px-3 py-3 font-semibold text-sky-600'
     : 'flex items-center gap-3 px-3 py-3 text-slate-500 transition hover:bg-slate-50 hover:text-sky-500'
 })
+
+const dashboardSiswaMenuClass = computed(() => {
+  const isActive = route.path === '/dashboard-siswa'
+  return isActive
+    ? 'flex items-center gap-3 border-r-4 border-sky-500 bg-sky-50 px-3 py-3 font-semibold text-sky-600'
+    : 'flex items-center gap-3 px-3 py-3 text-slate-500 transition hover:bg-slate-50 hover:text-sky-500'
+})
 </script>
 
 <template>
@@ -34,6 +41,9 @@ const bankSoalMenuClass = computed(() => {
       <nav class="flex-1 space-y-1 px-3 text-sm">
         <RouterLink :class="dashboardMenuClass" to="/dashboard">
           <span>Dashboard</span>
+        </RouterLink>
+        <RouterLink :class="dashboardSiswaMenuClass" to="/dashboard-siswa">
+          <span>Dashboard Siswa</span>
         </RouterLink>
         <RouterLink :class="bankSoalMenuClass" to="/bank-soal">
           <span>Bank Soal</span>

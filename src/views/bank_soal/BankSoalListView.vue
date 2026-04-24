@@ -6,11 +6,11 @@
                     <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">Bank Soal</h1>
                     <p class="mt-2 text-sm text-slate-500">Kelola materi ujian dan kumpulan pertanyaan Anda di sini.</p>
                 </div>
-                <button
+                <RouterLink to="/bank-soal/tambah"
                     class="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-95">
                     <span>＋</span>
                     <span>Buat Bank Soal Baru</span>
-                </button>
+                </RouterLink>
             </div>
 
             <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">

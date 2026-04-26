@@ -3,6 +3,7 @@ import dashboardRoutes from './modules/dashboard'
 import bankSoalRoutes from './modules/bankSoal'
 import loginRoutes from './modules/login'
 import ujianRoutes from './modules/ujian'
+import pesertaUjianRoutes from './modules/pesertaUjian'
 
 const routes = [
     {
@@ -13,6 +14,7 @@ const routes = [
     ...dashboardRoutes,
     ...bankSoalRoutes,
     ...ujianRoutes,
+    ...pesertaUjianRoutes,
 ]
 
 const router = createRouter({

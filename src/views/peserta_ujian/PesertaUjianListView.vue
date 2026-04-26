@@ -23,11 +23,11 @@ const pesertaList = [
                         <span>＋</span>
                         <span>Tambah Peserta</span>
                     </RouterLink>
-                    <button
+                    <RouterLink to="/peserta-ujian/upload"
                         class="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-5 py-2.5 text-sm font-bold text-sky-700 transition hover:bg-sky-100 active:scale-95">
                         <span>⬆</span>
                         <span>Upload Excel</span>
-                    </button>
+                    </RouterLink>
                 </div>
 
                 <div class="relative w-full max-w-sm">

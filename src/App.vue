@@ -4,8 +4,11 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-const showSidebar = computed(() => route.path !== '/login')
-const showGlobalHeader = computed(() => route.path !== '/login')
+const isLoginPage = computed(() => route.path === '/login')
+const isFullscreenPage = computed(() => Boolean(route.meta?.fullscreen))
+
+const showSidebar = computed(() => !isLoginPage.value && !isFullscreenPage.value)
+const showGlobalHeader = computed(() => !isLoginPage.value && !isFullscreenPage.value)
 
 const dashboardMenuClass = computed(() => {
   const isActive = route.path === '/dashboard'

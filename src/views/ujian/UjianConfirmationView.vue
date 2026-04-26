@@ -163,10 +163,11 @@ const instructions = [
                             </div>
                         </div>
 
-                        <button
-                            class="inline-flex items-center justify-center rounded-2xl bg-sky-500 px-10 py-5 text-lg font-bold text-white transition hover:-translate-y-0.5 hover:bg-sky-600 active:scale-95">
+                        <RouterLink
+                            class="inline-flex items-center justify-center rounded-2xl bg-sky-500 px-10 py-5 text-lg font-bold text-white transition hover:-translate-y-0.5 hover:bg-sky-600 active:scale-95"
+                            :to="{ name: 'ujian-attempt', params: { id: exam.id } }">
                             Mulai Ujian Sekarang
-                        </button>
+                        </RouterLink>
                     </section>
                 </template>
             </div>

@@ -77,7 +77,8 @@ const actionClass = (style) => {
                         <p class="mt-2 text-sm text-slate-500">Senin, 14 Oktober 2024</p>
                     </div>
 
-                    <div class="inline-flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2">
+                    <div
+                        class="inline-flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2">
                         <div class="h-2 w-2 rounded-full bg-emerald-500"></div>
                         <span class="text-sm font-medium text-emerald-700">Sesi Sedang Berlangsung</span>
                     </div>
@@ -89,7 +90,8 @@ const actionClass = (style) => {
                         <div class="absolute left-0 top-0 h-full w-1.5" :class="statusBorderClass(exam.status)"></div>
 
                         <div class="flex flex-col gap-6 md:flex-row md:items-center">
-                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-2xl">
+                            <div
+                                class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-2xl">
                                 {{ exam.isOnline ? '🌐' : '📝' }}
                             </div>
 
@@ -110,7 +112,14 @@ const actionClass = (style) => {
                                 </div>
                             </div>
 
-                            <button class="w-full rounded-xl px-6 py-3 text-sm font-bold transition md:w-auto"
+                            <RouterLink v-if="exam.actionStyle === 'primary'"
+                                class="w-full rounded-xl px-6 py-3 text-center text-sm font-bold transition md:w-auto"
+                                :class="actionClass(exam.actionStyle)"
+                                :to="{ name: 'ujian-confirmation', params: { id: exam.id } }">
+                                {{ exam.actionLabel }}
+                            </RouterLink>
+
+                            <button v-else class="w-full rounded-xl px-6 py-3 text-sm font-bold transition md:w-auto"
                                 :class="actionClass(exam.actionStyle)">
                                 {{ exam.actionLabel }}
                             </button>
@@ -122,10 +131,12 @@ const actionClass = (style) => {
                     <article class="md:col-span-2 rounded-3xl bg-gradient-to-br from-sky-500 to-sky-700 p-8 text-white">
                         <h3 class="text-xl font-bold">Panduan Ujian Digital</h3>
                         <p class="mt-2 text-sm text-white/90">
-                            Pastikan koneksi internet stabil dan perangkat siap sebelum memulai ujian. Gunakan browser terbaru
+                            Pastikan koneksi internet stabil dan perangkat siap sebelum memulai ujian. Gunakan browser
+                            terbaru
                             agar kompatibilitas tetap optimal.
                         </p>
-                        <button class="mt-6 rounded-lg bg-white px-5 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-50">
+                        <button
+                            class="mt-6 rounded-lg bg-white px-5 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-50">
                             Baca Selengkapnya
                         </button>
                     </article>
@@ -135,7 +146,8 @@ const actionClass = (style) => {
                         <p class="mt-2 text-sm text-slate-600">
                             Jika ada kendala teknis saat pengerjaan ujian, segera hubungi tim IT support sekolah.
                         </p>
-                        <a class="mt-4 inline-flex items-center text-sm font-semibold text-emerald-700 hover:underline" href="#">
+                        <a class="mt-4 inline-flex items-center text-sm font-semibold text-emerald-700 hover:underline"
+                            href="#">
                             Hubungi IT Support
                         </a>
                     </article>

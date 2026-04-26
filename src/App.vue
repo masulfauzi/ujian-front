@@ -38,6 +38,13 @@ const pesertaUjianMenuClass = computed(() => {
     : 'flex items-center gap-3 px-3 py-3 text-slate-500 transition hover:bg-slate-50 hover:text-sky-500'
 })
 
+const jadwalUjianMenuClass = computed(() => {
+  const isActive = route.path.startsWith('/jadwal-ujian')
+  return isActive
+    ? 'flex items-center gap-3 border-r-4 border-sky-500 bg-sky-50 px-3 py-3 font-semibold text-sky-600'
+    : 'flex items-center gap-3 px-3 py-3 text-slate-500 transition hover:bg-slate-50 hover:text-sky-500'
+})
+
 const dashboardSiswaMenuClass = computed(() => {
   const isActive = route.path === '/dashboard-siswa'
   return isActive
@@ -71,10 +78,9 @@ const dashboardSiswaMenuClass = computed(() => {
         <RouterLink :class="pesertaUjianMenuClass" to="/peserta-ujian">
           <span>Peserta Ujian</span>
         </RouterLink>
-        <a class="flex items-center gap-3 px-3 py-3 text-slate-500 transition hover:bg-slate-50 hover:text-sky-500"
-          href="#">
+        <RouterLink :class="jadwalUjianMenuClass" to="/jadwal-ujian">
           <span>Jadwal Ujian</span>
-        </a>
+        </RouterLink>
         <a class="flex items-center gap-3 px-3 py-3 text-slate-500 transition hover:bg-slate-50 hover:text-sky-500"
           href="#">
           <span>Nilai</span>

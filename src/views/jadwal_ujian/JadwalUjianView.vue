@@ -89,11 +89,11 @@ const jadwalList = [
                         <p class="mt-1 text-sm text-slate-500">Kelola dan pantau semua sesi ujian yang aktif maupun
                             mendatang.</p>
                     </div>
-                    <button
+                    <RouterLink to="/jadwal-ujian/tambah"
                         class="flex items-center justify-center gap-2 rounded-xl bg-sky-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-sky-200 transition-all hover:brightness-110 active:scale-95">
                         <span>➕</span>
                         <span>Buat Jadwal Baru</span>
-                    </button>
+                    </RouterLink>
                 </div>
 
                 <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">

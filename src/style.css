@@ -113,6 +113,103 @@
   }
 }
 
+@layer components {
+
+  /* Typography Component Classes using theme variables */
+  .font-h1 {
+    font-family: var(--font-family-h1);
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+    font-weight: var(--font-weight-h1);
+    letter-spacing: var(--letter-spacing-h1);
+  }
+
+  .text-h1 {
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+    font-weight: var(--font-weight-h1);
+  }
+
+  .font-h2 {
+    font-family: var(--font-family-h2);
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: var(--font-weight-h2);
+    letter-spacing: var(--letter-spacing-h2);
+  }
+
+  .text-h2 {
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: var(--font-weight-h2);
+  }
+
+  .font-h3 {
+    font-family: var(--font-family-h3);
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-h3);
+  }
+
+  .text-h3 {
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-h3);
+  }
+
+  .font-label-md {
+    font-family: var(--font-family-label-md);
+    font-size: var(--font-size-label-md);
+    line-height: var(--line-height-label-md);
+    font-weight: var(--font-weight-label-md);
+  }
+
+  .text-label-md {
+    font-size: var(--font-size-label-md);
+    line-height: var(--line-height-label-md);
+    font-weight: var(--font-weight-label-md);
+  }
+
+  .font-label-sm {
+    font-family: var(--font-family-label-sm);
+    font-size: var(--font-size-label-sm);
+    line-height: var(--line-height-label-sm);
+    font-weight: var(--font-weight-label-sm);
+  }
+
+  .text-label-sm {
+    font-size: var(--font-size-label-sm);
+    line-height: var(--line-height-label-sm);
+    font-weight: var(--font-weight-label-sm);
+  }
+
+  .font-body-md {
+    font-family: var(--font-family-body-md);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    font-weight: var(--font-weight-body-md);
+  }
+
+  .text-body-md {
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    font-weight: var(--font-weight-body-md);
+  }
+
+  .font-body-lg {
+    font-family: var(--font-family-body-lg);
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
+    font-weight: var(--font-weight-body-lg);
+  }
+
+  .text-body-lg {
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
+    font-weight: var(--font-weight-body-lg);
+  }
+}
+
 @layer utilities {
   .bg-mesh {
     background-color: #f8f9ff;

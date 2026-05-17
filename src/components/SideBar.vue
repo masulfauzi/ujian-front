@@ -44,22 +44,30 @@
 
         <!-- Bottom Menu -->
         <div class="mt-auto pt-6 border-t border-slate-100 space-y-1">
-            <a href="#"
-                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+            <button
+                class="w-full text-left flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
                 <span class="material-symbols-outlined">settings</span>
                 <span class="font-label-md text-label-md">Settings</span>
-            </a>
-            <a href="#"
-                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+            </button>
+            <button
+                @click="handleLogout"
+                class="w-full text-left flex items-center gap-3 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
                 <span class="material-symbols-outlined">logout</span>
                 <span class="font-label-md text-label-md">Logout</span>
-            </a>
+            </button>
         </div>
     </aside>
 </template>
 
-<script>
-export default {
-    name: 'SideBar'
+<script setup>
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const handleLogout = () => {
+    authStore.logout()
+    router.push('/login')
 }
 </script>

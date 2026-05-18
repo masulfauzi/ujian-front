@@ -48,16 +48,13 @@
             <label class="block text-sm font-semibold text-slate-900 mb-2">
               Mata Pelajaran <span class="text-red-600">*</span>
             </label>
-            <select
-              v-model="formData.mapel_id"
+            <SearchableSelect
+              :model-value="formData.mapel_id"
+              @update:model-value="formData.mapel_id = $event"
               @blur="validateMapel"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
-              :class="{ 'border-red-500 focus:ring-red-500': errors.mapel_id }">
-              <option value="">Pilih Mata Pelajaran</option>
-              <option v-for="mapel in mapels" :key="mapel.id" :value="mapel.id">
-                {{ mapel.nama_mapel }}
-              </option>
-            </select>
+              :options="mapelOptions"
+              :placeholder="'Cari mata pelajaran...'"
+              :has-error="!!errors.mapel_id" />
             <p v-if="errors.mapel_id" class="text-red-600 text-sm mt-1">{{ errors.mapel_id }}</p>
           </div>
 
@@ -103,6 +100,7 @@
 import { reactive, ref, computed, onMounted } from 'vue'
 import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import { useBankSoalStore } from '@/stores/bankSoal'
 import { useMapelStore } from '@/stores/mapel'
 import { useRouter } from 'vue-router'
@@ -130,6 +128,13 @@ onMounted(async () => {
 })
 
 const mapels = computed(() => mapelStore.mapels)
+
+const mapelOptions = computed(() =>
+  mapels.value.map(mapel => ({
+    id: mapel.id,
+    label: mapel.nama_mapel
+  }))
+)
 
 const validateNamaBankSoal = () => {
   errors.nama_bank_soal = ''

@@ -36,27 +36,62 @@
         <!-- Navigation Menu - Admin -->
         <nav v-else class="space-y-1">
             <router-link to="/admin/dashboard"
-                class="flex items-center gap-3 bg-sky-50 text-sky-600 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200">
+                :class="[
+                    'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                    isActivePath('/admin/dashboard')
+                        ? 'bg-sky-50 text-sky-600'
+                        : 'text-slate-600 hover:bg-slate-50 transition-all'
+                ]">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span class="font-label-md text-label-md">Dashboard</span>
             </router-link>
+            <router-link to="/admin/mapel"
+                :class="[
+                    'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                    isActivePath('/admin/mapel')
+                        ? 'bg-sky-50 text-sky-600'
+                        : 'text-slate-600 hover:bg-slate-50 transition-all'
+                ]">
+                <span class="material-symbols-outlined">subject</span>
+                <span class="font-label-md text-label-md">Mapel</span>
+            </router-link>
             <router-link to="/admin/bank-soal"
-                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                :class="[
+                    'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                    isActivePath('/admin/bank-soal')
+                        ? 'bg-sky-50 text-sky-600'
+                        : 'text-slate-600 hover:bg-slate-50 transition-all'
+                ]">
                 <span class="material-symbols-outlined">database</span>
                 <span class="font-label-md text-label-md">Bank Soal</span>
             </router-link>
             <router-link to="/admin/peserta"
-                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                :class="[
+                    'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                    isActivePath('/admin/peserta')
+                        ? 'bg-sky-50 text-sky-600'
+                        : 'text-slate-600 hover:bg-slate-50 transition-all'
+                ]">
                 <span class="material-symbols-outlined">group</span>
                 <span class="font-label-md text-label-md">Peserta Ujian</span>
             </router-link>
             <router-link to="/admin/jadwal"
-                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                :class="[
+                    'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                    isActivePath('/admin/jadwal')
+                        ? 'bg-sky-50 text-sky-600'
+                        : 'text-slate-600 hover:bg-slate-50 transition-all'
+                ]">
                 <span class="material-symbols-outlined">event</span>
                 <span class="font-label-md text-label-md">Jadwal Ujian</span>
             </router-link>
             <router-link to="/admin/nilai"
-                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                :class="[
+                    'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                    isActivePath('/admin/nilai')
+                        ? 'bg-sky-50 text-sky-600'
+                        : 'text-slate-600 hover:bg-slate-50 transition-all'
+                ]">
                 <span class="material-symbols-outlined">grade</span>
                 <span class="font-label-md text-label-md">Nilai</span>
             </router-link>
@@ -91,12 +126,20 @@
 <script setup>
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const isAdmin = computed(() => authStore.currentUser?.role === 'admin')
+
+const isActivePath = (path) => {
+    if (path === '/admin/dashboard') {
+        return route.path === '/admin/dashboard'
+    }
+    return route.path.startsWith(path)
+}
 
 const handleLogout = () => {
     authStore.logout()

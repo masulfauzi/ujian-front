@@ -1,11 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { dashboardRoutes } from '../modules/dashboard/routes'
 import { authRoutes } from '../modules/auth/routes'
+import { mapelRoutes } from '../modules/mapel/routes'
 import { setupAuthGuards } from './guards'
 
 const routes = [
     { path: '/', redirect: '/login' },
     ...dashboardRoutes,
+    ...mapelRoutes,
     ...authRoutes,
 ]
 

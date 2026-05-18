@@ -50,5 +50,5 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const isLoginPage = computed(() => route.path === '/login')
-const isDashboardPage = computed(() => route.path.startsWith('/dashboard'))
+const isDashboardPage = computed(() => route.path.startsWith('/dashboard') || route.path.startsWith('/admin'))
 </script>

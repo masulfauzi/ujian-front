@@ -225,6 +225,7 @@ onMounted(async () => {
 
     if (soal) {
       formData.nama_bank_soal = soal.nama_bank_soal || ''
+      // Support both response shapes while the soal detail payload is normalized.
       formData.mapel_id = String(soal.id_mapel ?? soal.mapel_id ?? '')
       formData.jml_soal = soal.jml_soal ? Number(soal.jml_soal) : ''
       formData.tipe_soal = soal.tipe_soal
@@ -250,7 +251,7 @@ onMounted(async () => {
 const mapels = computed(() => mapelStore.mapels)
 const mapelOptions = computed(() =>
   mapels.value.map(mapel => ({
-    id: mapel.id,
+    id: String(mapel.id),
     label: mapel.nama_mapel
   }))
 )

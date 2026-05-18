@@ -28,4 +28,10 @@ export const bankSoalRoutes = [
     component: SoalEdit,
     meta: { requiresAuth: true, requiresAdmin: true },
   },
+  {
+    path: '/admin/bank-soal/:id/soal',
+    name: 'bankSoal.soalInput',
+    component: () => import('../views/SoalInput.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true, title: 'Input Soal' },
+  },
 ]

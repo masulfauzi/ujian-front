@@ -218,6 +218,7 @@ const isSubmitting = ref(false)
 const error = ref(null)
 const mapelSearch = ref('')
 const isMapelDropdownOpen = ref(false)
+const MAPEL_DROPDOWN_BLUR_DELAY = 200
 
 const formData = reactive({
   nama_bank_soal: '',
@@ -250,7 +251,6 @@ onMounted(async () => {
     const soal = bankSoalStore.selectedSoal
 
     if (soal) {
-      console.log('Fetched soal data:', soal)
       formData.nama_bank_soal = soal.nama_bank_soal || ''
       formData.mapel_id = String(soal.mapel_id || soal.id_mapel || '')
       formData.jml_soal = soal.jml_soal ? Number(soal.jml_soal) : ''
@@ -302,7 +302,7 @@ const handleMapelBlur = () => {
       mapelSearch.value = ''
     }
     validateMapel()
-  }, 200)
+  }, MAPEL_DROPDOWN_BLUR_DELAY)
 }
 
 const getSelectedMapelName = () => {

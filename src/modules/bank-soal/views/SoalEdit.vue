@@ -61,7 +61,7 @@
               @update:model-value="formData.mapel_id = $event"
               @blur="validateMapel"
               :options="mapelOptions"
-              :placeholder="'Cari mata pelajaran...'"
+              placeholder="Cari mata pelajaran..."
               :has-error="!!errors.mapel_id" />
             <p v-if="errors.mapel_id" class="text-red-600 text-sm mt-1">{{ errors.mapel_id }}</p>
           </div>

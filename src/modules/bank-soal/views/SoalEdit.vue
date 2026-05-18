@@ -225,7 +225,7 @@ onMounted(async () => {
 
     if (soal) {
       formData.nama_bank_soal = soal.nama_bank_soal || ''
-      // Support both response shapes while the soal detail payload is normalized.
+      // Support existing soal detail payloads that may return either id_mapel or mapel_id.
       formData.mapel_id = String(soal.id_mapel ?? soal.mapel_id ?? '')
       formData.jml_soal = soal.jml_soal ? Number(soal.jml_soal) : ''
       formData.tipe_soal = soal.tipe_soal

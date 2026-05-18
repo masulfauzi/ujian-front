@@ -21,15 +21,16 @@ export const useMapelStore = defineStore('mapel', {
   },
 
   actions: {
-    async fetchMapelList(page = 1) {
+    async fetchMapelList(page = 1, pageSize = 10) {
       this.isLoading = true
       this.error = null
 
       try {
-        const response = await mapelService.getMapelList(page, this.pageSize)
+        const response = await mapelService.getMapelList(page, pageSize)
         this.mapels = response.data.data
         this.totalMapels = response.data.total
         this.currentPage = page
+        this.pageSize = pageSize
         return response.data
       } catch (err) {
         this.error = err.response?.data?.message || 'Failed to fetch mapel list'

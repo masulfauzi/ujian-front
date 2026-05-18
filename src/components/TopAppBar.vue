@@ -2,15 +2,16 @@
     <!-- TopAppBar -->
     <header
         class="fixed top-0 right-0 left-64 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm flex justify-between items-center h-16 px-8">
-        <!-- Search Bar -->
+        <!-- Search Bar & Title -->
         <div class="flex items-center gap-4 flex-1">
+            <span class="text-lg font-semibold text-slate-800 font-h3 whitespace-nowrap">{{ pageTitle }}</span>
             <div class="relative w-full max-w-md">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
                     search
                 </span>
                 <input
                     class="w-full pl-10 pr-4 py-2 bg-slate-50 border-transparent rounded-full text-sm focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition-all"
-                    placeholder="Search exams, lessons, or grades..." type="text" />
+                    :placeholder="isAdmin ? 'Search exams, students...' : 'Search exams, lessons, or grades...'" type="text" />
             </div>
         </div>
 
@@ -87,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
@@ -95,10 +96,23 @@ const authStore = useAuthStore()
 const router = useRouter()
 const isDropdownOpen = ref(false)
 
-const userName = ref('Alex Johnston')
-const userEmail = ref('alex.johnston@university.edu')
-const userRole = ref('Undergraduate Student')
+const userName = ref('')
+const userEmail = ref('')
+const userRole = ref('')
 const userAvatar = ref('https://lh3.googleusercontent.com/aida-public/AB6AXuB9U5KURX3eumGQKeub8bUR7L74sraVdj5vIY-omMSvEMaGBJldTzEYfYTvmZppjymd35ebrZbDV3aifEC1b1mYRpgJ2zGe0qL_VWoku_0phkarPtEIQU8GRxUXoipSKtyNOZbHsH-I00WvpZcGt8JMEM1aDNdjpr4l_alp-GAOY3cOwO89_8BRSmRjB5x1XApXCbAqU2m2CVFsxWpsUr7Naw8F9zgR3DS_INZ4Lgmgq3NEfpt_10Qc189HaundOan0GJ7UbJwbkwpM')
+
+const isAdmin = computed(() => authStore.currentUser?.role === 'admin')
+
+const pageTitle = computed(() => {
+    return isAdmin.value ? 'Exam Management' : 'Student Dashboard'
+})
+
+onMounted(() => {
+    // Set user info from auth store
+    userName.value = authStore.currentUser?.name || 'User'
+    userEmail.value = authStore.currentUser?.email || 'user@example.com'
+    userRole.value = isAdmin.value ? 'Administrator' : 'Student'
+})
 
 const handleLogout = () => {
     isDropdownOpen.value = false

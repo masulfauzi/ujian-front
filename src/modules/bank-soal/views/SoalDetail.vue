@@ -46,18 +46,114 @@
             </div>
           </div>
 
-          <!-- Metadata Section -->
-          <div class="bg-white rounded-lg shadow border border-slate-200 p-6">
-            <h3 class="text-lg font-semibold text-slate-900 mb-4">Informasi Sistem</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p class="text-xs text-slate-500 uppercase font-semibold">Dibuat pada</p>
-                <p class="text-slate-900 font-medium">{{ formatDate(selectedSoal.created_at) }}</p>
+          <!-- Daftar Soal Section -->
+          <div v-if="soals.length > 0 || isSoalLoading" class="bg-white rounded-lg shadow border border-slate-200 p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Daftar Soal</h3>
+
+            <!-- Loading State -->
+            <div v-if="isSoalLoading" class="flex justify-center items-center py-12">
+              <div class="text-center">
+                <div class="inline-block w-10 h-10 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
+                <p class="mt-3 text-slate-600">Memuat soal...</p>
               </div>
-              <div>
-                <p class="text-xs text-slate-500 uppercase font-semibold">Diperbarui pada</p>
-                <p class="text-slate-900 font-medium">{{ formatDate(selectedSoal.updated_at) }}</p>
+            </div>
+
+            <!-- Soal List -->
+            <div v-else class="space-y-4">
+              <div v-for="(soal, index) in soals" :key="soal.id" class="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors">
+                <!-- Soal Number -->
+                <div class="text-sm font-semibold text-slate-600 mb-2">
+                  Soal {{ (soalStore.currentPage - 1) * soalStore.pageSize + index + 1 }}
+                </div>
+
+                <!-- Pertanyaan -->
+                <div class="mb-3">
+                  <p class="text-slate-900 font-medium">{{ soal.soal }}</p>
+                  <img v-if="soal.gambar_soal" :src="soal.gambar_soal" :alt="`Gambar soal ${index + 1}`" class="mt-2 max-w-xs max-h-40 rounded">
+                </div>
+
+                <!-- Opsi Jawaban -->
+                <div class="space-y-2 mb-3">
+                  <div v-for="(opsi, opsiIndex) in [soal.opsi_a, soal.opsi_b, soal.opsi_c, soal.opsi_d, soal.opsi_e]"
+                       v-if="opsi"
+                       :key="opsiIndex"
+                       class="flex items-start gap-3 ml-4">
+                    <!-- Opsi Label -->
+                    <span class="font-semibold text-slate-700 min-w-fit">{{ getOpsiLabel(opsiIndex) }}.</span>
+
+                    <!-- Opsi Text -->
+                    <div class="flex-1">
+                      <p class="text-slate-700">{{ opsi }}</p>
+                      <!-- Opsi Image -->
+                      <img v-if="opsiIndex === 0 && soal.gambar_a" :src="soal.gambar_a" :alt="'Opsi A'" class="mt-1 max-w-xs max-h-32 rounded">
+                      <img v-else-if="opsiIndex === 1 && soal.gambar_b" :src="soal.gambar_b" :alt="'Opsi B'" class="mt-1 max-w-xs max-h-32 rounded">
+                      <img v-else-if="opsiIndex === 2 && soal.gambar_c" :src="soal.gambar_c" :alt="'Opsi C'" class="mt-1 max-w-xs max-h-32 rounded">
+                      <img v-else-if="opsiIndex === 3 && soal.gambar_d" :src="soal.gambar_d" :alt="'Opsi D'" class="mt-1 max-w-xs max-h-32 rounded">
+                      <img v-else-if="opsiIndex === 4 && soal.gambar_e" :src="soal.gambar_e" :alt="'Opsi E'" class="mt-1 max-w-xs max-h-32 rounded">
+                    </div>
+
+                    <!-- Kunci Badge -->
+                    <span v-if="soal.kunci === getOpsiLabel(opsiIndex)" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
+                      ✓ Kunci
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Kunci Jawaban Display -->
+                <div class="bg-green-50 border border-green-200 rounded p-2 text-sm">
+                  <span class="font-semibold text-green-700">Kunci Jawaban:</span>
+                  <span class="text-green-700 ml-2">{{ soal.kunci }}</span>
+                </div>
               </div>
+            </div>
+
+            <!-- Error State -->
+            <div v-if="soalError && !isSoalLoading" class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+              {{ soalError }}
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="soals.length > 0 && totalPages > 1" class="flex items-center justify-between mt-6">
+              <p class="text-slate-600 text-sm">
+                Menampilkan {{ (soalStore.currentPage - 1) * soalStore.pageSize + 1 }} hingga
+                {{ Math.min(soalStore.currentPage * soalStore.pageSize, soalStore.totalSoals) }} dari {{ soalStore.totalSoals }} soal
+              </p>
+              <div class="flex gap-2">
+                <button
+                  @click="handleSoalPageChange(soalStore.currentPage - 1)"
+                  :disabled="soalStore.currentPage === 1"
+                  class="px-3 py-1 border border-slate-300 rounded text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm">
+                  Sebelumnya
+                </button>
+                <div class="flex items-center gap-1">
+                  <button
+                    v-for="page in totalPages"
+                    :key="page"
+                    @click="handleSoalPageChange(page)"
+                    :class="[
+                      'px-2 py-1 rounded text-sm transition-colors',
+                      page === soalStore.currentPage
+                        ? 'bg-sky-600 text-white'
+                        : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                    ]">
+                    {{ page }}
+                  </button>
+                </div>
+                <button
+                  @click="handleSoalPageChange(soalStore.currentPage + 1)"
+                  :disabled="soalStore.currentPage === totalPages"
+                  class="px-3 py-1 border border-slate-300 rounded text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm">
+                  Berikutnya
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div v-if="!isSoalLoading && soals.length === 0" class="bg-white rounded-lg shadow border border-slate-200 p-6">
+            <div class="text-center py-8">
+              <span class="material-symbols-outlined text-4xl text-slate-300">quiz</span>
+              <p class="text-slate-600 mt-2">Belum ada soal dalam bank soal ini</p>
             </div>
           </div>
 
@@ -105,11 +201,13 @@ import TopAppBar from '@/components/TopAppBar.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankSoalStore } from '@/stores/bankSoal'
 import { useMapelStore } from '@/stores/mapel'
+import { useSoalStore } from '@/stores/soal'
 
 const route = useRoute()
 const router = useRouter()
 const bankSoalStore = useBankSoalStore()
 const mapelStore = useMapelStore()
+const soalStore = useSoalStore()
 const soalId = route.params.id
 
 const error = ref(null)
@@ -124,10 +222,16 @@ const mapelNama = computed(() => {
   return mapel ? mapel.nama_mapel : '-'
 })
 
+const soals = computed(() => soalStore.soals)
+const isSoalLoading = computed(() => soalStore.isLoading)
+const soalError = computed(() => soalStore.error)
+const totalPages = computed(() => soalStore.totalPages)
+
 onMounted(async () => {
   try {
     await mapelStore.fetchMapelList(1, 100)
     await bankSoalStore.fetchSoalById(soalId)
+    await soalStore.fetchSoalByBankId(soalId, 1)
   } catch (err) {
     error.value = 'Gagal memuat detail soal'
   }
@@ -166,6 +270,16 @@ const formatDate = (dateString) => {
   } catch {
     return dateString
   }
+}
+
+const handleSoalPageChange = async (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    await soalStore.fetchSoalByBankId(soalId, page)
+  }
+}
+
+const getOpsiLabel = (index) => {
+  return String.fromCharCode(65 + index)
 }
 
 const handleEdit = () => {

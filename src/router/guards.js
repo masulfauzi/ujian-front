@@ -13,11 +13,28 @@ export function setupAuthGuards(router) {
         const publicRoutes = ['/login', '/register']
         const isPublicRoute = publicRoutes.includes(to.path)
 
+        // Check if route requires admin access
+        const requiresAdmin = to.meta?.requiresAdmin || false
+
         // If user is authenticated
         if (authStore.isAuthenticated) {
-            // If trying to access login/register, redirect to dashboard
+            // Check admin route protection
+            if (requiresAdmin) {
+                const isAdmin = authStore.currentUser?.role === 'admin'
+                if (!isAdmin) {
+                    // Non-admin trying to access admin route
+                    next('/dashboard')
+                    return
+                }
+            }
+
+            // If trying to access login/register, redirect based on role
             if (isPublicRoute) {
-                next('/dashboard')
+                if (authStore.currentUser?.role === 'admin') {
+                    next('/admin/dashboard')
+                } else {
+                    next('/dashboard')
+                }
             } else {
                 // Allow access to other routes
                 next()

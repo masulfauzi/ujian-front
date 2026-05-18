@@ -10,12 +10,12 @@
             </div>
             <div>
                 <h2 class="text-lg font-black text-sky-600 leading-none">ExamPro</h2>
-                <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Student Portal</p>
+                <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{{ isAdmin ? 'Management Portal' : 'Student Portal' }}</p>
             </div>
         </div>
 
-        <!-- Navigation Menu -->
-        <nav class="space-y-1">
+        <!-- Navigation Menu - User -->
+        <nav v-if="!isAdmin" class="space-y-1">
             <router-link to="/dashboard"
                 class="flex items-center gap-3 bg-sky-50 text-sky-600 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200">
                 <span class="material-symbols-outlined">dashboard</span>
@@ -33,8 +33,37 @@
             </router-link>
         </nav>
 
-        <!-- Start Exam Button -->
-        <div class="mt-8 px-4">
+        <!-- Navigation Menu - Admin -->
+        <nav v-else class="space-y-1">
+            <router-link to="/admin/dashboard"
+                class="flex items-center gap-3 bg-sky-50 text-sky-600 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-label-md text-label-md">Dashboard</span>
+            </router-link>
+            <router-link to="/admin/bank-soal"
+                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                <span class="material-symbols-outlined">database</span>
+                <span class="font-label-md text-label-md">Bank Soal</span>
+            </router-link>
+            <router-link to="/admin/peserta"
+                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                <span class="material-symbols-outlined">group</span>
+                <span class="font-label-md text-label-md">Peserta Ujian</span>
+            </router-link>
+            <router-link to="/admin/jadwal"
+                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                <span class="material-symbols-outlined">event</span>
+                <span class="font-label-md text-label-md">Jadwal Ujian</span>
+            </router-link>
+            <router-link to="/admin/nilai"
+                class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
+                <span class="material-symbols-outlined">grade</span>
+                <span class="font-label-md text-label-md">Nilai</span>
+            </router-link>
+        </nav>
+
+        <!-- Start Exam Button (User only) -->
+        <div v-if="!isAdmin" class="mt-8 px-4">
             <button
                 class="w-full bg-primary-container text-white rounded-xl py-3 px-4 font-bold text-sm shadow-lg shadow-sky-200 flex items-center justify-center gap-2 scale-95 active:scale-90 duration-150 hover:scale-100 transition-transform">
                 <span class="material-symbols-outlined text-sm">add_circle</span>
@@ -60,11 +89,14 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+const isAdmin = computed(() => authStore.currentUser?.role === 'admin')
 
 const handleLogout = () => {
     authStore.logout()

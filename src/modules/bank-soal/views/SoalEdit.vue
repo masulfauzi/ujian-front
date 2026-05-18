@@ -56,38 +56,13 @@
             <label class="block text-sm font-semibold text-slate-900 mb-2">
               Mata Pelajaran <span class="text-red-600">*</span>
             </label>
-            <div class="relative">
-              <input
-                v-model="mapelSearch"
-                @focus="isMapelDropdownOpen = true"
-                @blur="handleMapelBlur"
-                type="text"
-                placeholder="Cari atau pilih mata pelajaran..."
-                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
-                :class="{ 'border-red-500 focus:ring-red-500': errors.mapel_id }">
-
-              <!-- Dropdown Options -->
-              <div v-if="isMapelDropdownOpen" class="absolute top-full left-0 right-0 mt-1 border border-slate-300 rounded-lg bg-white shadow-lg z-10 max-h-64 overflow-y-auto">
-                <div v-if="filteredMapels.length === 0" class="px-4 py-3 text-slate-500 text-sm">
-                  Tidak ada mata pelajaran yang sesuai
-                </div>
-                <div
-                  v-for="mapel in filteredMapels"
-                  :key="mapel.id"
-                  @click="selectMapel(mapel)"
-                  class="px-4 py-3 hover:bg-sky-50 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors">
-                  <div class="font-medium text-slate-900">{{ mapel.nama_mapel }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Selected Value Display -->
-            <div v-if="formData.mapel_id" class="mt-2">
-              <span class="inline-block bg-sky-50 text-sky-700 px-3 py-1 rounded-full text-sm font-medium">
-                {{ getSelectedMapelName() }}
-              </span>
-            </div>
-
+            <SearchableSelect
+              :model-value="formData.mapel_id"
+              @update:model-value="formData.mapel_id = $event"
+              @blur="validateMapel"
+              :options="mapelOptions"
+              placeholder="Cari mata pelajaran..."
+              :has-error="!!errors.mapel_id" />
             <p v-if="errors.mapel_id" class="text-red-600 text-sm mt-1">{{ errors.mapel_id }}</p>
           </div>
 
@@ -203,6 +178,7 @@
 import { reactive, ref, computed, onMounted } from 'vue'
 import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankSoalStore } from '@/stores/bankSoal'
 import { useMapelStore } from '@/stores/mapel'
@@ -216,8 +192,6 @@ const soalId = route.params.id
 const isLoadingDetail = ref(true)
 const isSubmitting = ref(false)
 const error = ref(null)
-const mapelSearch = ref('')
-const isMapelDropdownOpen = ref(false)
 
 const formData = reactive({
   nama_bank_soal: '',
@@ -250,15 +224,14 @@ onMounted(async () => {
     const soal = bankSoalStore.selectedSoal
 
     if (soal) {
-      console.log('Fetched soal data:', soal)
       formData.nama_bank_soal = soal.nama_bank_soal || ''
-      formData.mapel_id = String(soal.mapel_id || soal.id_mapel || '')
+      // Support existing soal detail payloads that may return either id_mapel or mapel_id.
+      formData.mapel_id = String(soal.id_mapel ?? soal.mapel_id ?? '')
       formData.jml_soal = soal.jml_soal ? Number(soal.jml_soal) : ''
       formData.tipe_soal = soal.tipe_soal
       formData.pertanyaan = soal.pertanyaan
       formData.tingkat_kesulitan = soal.tingkat_kesulitan
       formData.kunci_jawaban = soal.kunci_jawaban || ''
-      mapelSearch.value = getSelectedMapelName()
 
       if (soal.tipe_soal === 'pilihan_ganda') {
         pilihanJawaban.splice(0, pilihanJawaban.length)
@@ -276,39 +249,12 @@ onMounted(async () => {
 })
 
 const mapels = computed(() => mapelStore.mapels)
-
-const filteredMapels = computed(() => {
-  if (!mapelSearch.value.trim()) {
-    return mapels.value
-  }
-  return mapels.value.filter(mapel =>
-    mapel.nama_mapel.toLowerCase().includes(mapelSearch.value.toLowerCase())
-  )
-})
-
-const selectMapel = (mapel) => {
-  formData.mapel_id = mapel.id
-  mapelSearch.value = mapel.nama_mapel
-  isMapelDropdownOpen.value = false
-  validateMapel()
-}
-
-const handleMapelBlur = () => {
-  setTimeout(() => {
-    isMapelDropdownOpen.value = false
-    if (formData.mapel_id) {
-      mapelSearch.value = getSelectedMapelName()
-    } else {
-      mapelSearch.value = ''
-    }
-    validateMapel()
-  }, 200)
-}
-
-const getSelectedMapelName = () => {
-  const mapel = mapels.value.find(m => m.id === formData.mapel_id)
-  return mapel ? mapel.nama_mapel : ''
-}
+const mapelOptions = computed(() =>
+  mapels.value.map(mapel => ({
+    id: String(mapel.id),
+    label: mapel.nama_mapel
+  }))
+)
 
 const validateNamaBankSoal = () => {
   errors.nama_bank_soal = ''

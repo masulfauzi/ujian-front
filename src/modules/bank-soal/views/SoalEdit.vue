@@ -56,17 +56,14 @@
             <label class="block text-sm font-semibold text-slate-900 mb-2">
               Mata Pelajaran <span class="text-red-600">*</span>
             </label>
-            <select
-              v-model="formData.mapel_id"
+            <SearchableSelect
+              :model-value="formData.id_mapel"
+              @update:model-value="formData.id_mapel = $event"
               @blur="validateMapel"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
-              :class="{ 'border-red-500 focus:ring-red-500': errors.mapel_id }">
-              <option value="">Pilih Mata Pelajaran</option>
-              <option v-for="mapel in mapels" :key="mapel.id" :value="mapel.id">
-                {{ mapel.nama_mapel }}
-              </option>
-            </select>
-            <p v-if="errors.mapel_id" class="text-red-600 text-sm mt-1">{{ errors.mapel_id }}</p>
+              :options="mapelOptions"
+              :placeholder="'Cari mata pelajaran...'"
+              :has-error="!!errors.id_mapel" />
+            <p v-if="errors.id_mapel" class="text-red-600 text-sm mt-1">{{ errors.id_mapel }}</p>
           </div>
 
           <!-- Jumlah Soal -->
@@ -181,6 +178,7 @@
 import { reactive, ref, computed, onMounted } from 'vue'
 import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
+import SearchableSelect from '@/components/SearchableSelect.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankSoalStore } from '@/stores/bankSoal'
 import { useMapelStore } from '@/stores/mapel'
@@ -197,7 +195,7 @@ const error = ref(null)
 
 const formData = reactive({
   nama_bank_soal: '',
-  mapel_id: '',
+  id_mapel: '',
   jml_soal: '',
   tipe_soal: 'pilihan_ganda',
   pertanyaan: 'Bank Soal',
@@ -210,7 +208,7 @@ const pilihanJawaban = reactive([])
 
 const errors = reactive({
   nama_bank_soal: '',
-  mapel_id: '',
+  id_mapel: '',
   jml_soal: '',
   tipe_soal: '',
   pertanyaan: '',
@@ -227,7 +225,7 @@ onMounted(async () => {
 
     if (soal) {
       formData.nama_bank_soal = soal.nama_bank_soal || ''
-      formData.mapel_id = soal.mapel_id
+      formData.id_mapel = soal.id_mapel
       formData.jml_soal = soal.jml_soal || ''
       formData.tipe_soal = soal.tipe_soal
       formData.pertanyaan = soal.pertanyaan
@@ -251,6 +249,13 @@ onMounted(async () => {
 
 const mapels = computed(() => mapelStore.mapels)
 
+const mapelOptions = computed(() =>
+  mapels.value.map(mapel => ({
+    id: mapel.id,
+    label: mapel.nama_mapel
+  }))
+)
+
 const validateNamaBankSoal = () => {
   errors.nama_bank_soal = ''
   if (!formData.nama_bank_soal || formData.nama_bank_soal.trim().length === 0) {
@@ -259,9 +264,9 @@ const validateNamaBankSoal = () => {
 }
 
 const validateMapel = () => {
-  errors.mapel_id = ''
-  if (!formData.mapel_id) {
-    errors.mapel_id = 'Mata pelajaran wajib dipilih'
+  errors.id_mapel = ''
+  if (!formData.id_mapel) {
+    errors.id_mapel = 'Mata pelajaran wajib dipilih'
   }
 }
 
@@ -296,7 +301,7 @@ const validateForm = () => {
   validateNamaBankSoal()
   validateMapel()
   validateJmlSoal()
-  return !errors.nama_bank_soal && !errors.mapel_id && !errors.jml_soal
+  return !errors.nama_bank_soal && !errors.id_mapel && !errors.jml_soal
 }
 
 const getTipeSoalLabel = (tipe) => {
@@ -320,7 +325,7 @@ const handleSubmit = async () => {
   try {
     const payload = {
       nama_bank_soal: formData.nama_bank_soal.trim(),
-      id_mapel: formData.mapel_id,
+      id_mapel: formData.id_mapel,
       jml_soal: parseInt(formData.jml_soal)
     }
 

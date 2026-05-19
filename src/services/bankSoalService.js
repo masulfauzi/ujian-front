@@ -8,7 +8,7 @@ export const bankSoalService = {
         page_size: pageSize,
         ...filters
       }
-      const response = await api.get('/api/bank-soal', { params })
+      const response = await api.get('/bank-soal', { params })
       return response.data
     } catch (error) {
       throw error
@@ -17,7 +17,7 @@ export const bankSoalService = {
 
   getSoalById: async (id) => {
     try {
-      const response = await api.get(`/api/bank-soal/${id}`)
+      const response = await api.get(`/bank-soal/${id}`)
       return response.data
     } catch (error) {
       throw error
@@ -26,7 +26,7 @@ export const bankSoalService = {
 
   createSoal: async (payload) => {
     try {
-      const response = await api.post('/api/bank-soal', payload)
+      const response = await api.post('/bank-soal', payload)
       return response.data
     } catch (error) {
       throw error
@@ -35,7 +35,7 @@ export const bankSoalService = {
 
   updateSoal: async (id, payload) => {
     try {
-      const response = await api.put(`/api/bank-soal/${id}`, payload)
+      const response = await api.put(`/bank-soal/${id}`, payload)
       return response.data
     } catch (error) {
       throw error
@@ -44,7 +44,7 @@ export const bankSoalService = {
 
   deleteSoal: async (id) => {
     try {
-      const response = await api.delete(`/api/bank-soal/${id}`)
+      const response = await api.delete(`/bank-soal/${id}`)
       return response.data
     } catch (error) {
       throw error
@@ -53,7 +53,20 @@ export const bankSoalService = {
 
   restoreSoal: async (id) => {
     try {
-      const response = await api.patch(`/api/bank-soal/${id}/restore`)
+      const response = await api.patch(`/bank-soal/${id}/restore`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  importSoalFromExcel: async (formData) => {
+    try {
+      const response = await api.post('/bank-soal/import', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
       return response.data
     } catch (error) {
       throw error

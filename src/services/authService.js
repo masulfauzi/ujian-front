@@ -1,7 +1,7 @@
 import api from './api'
 
 export const registerUser = async (payload) => {
-    const response = await api.post('/api/auth/register', {
+    const response = await api.post('/auth/register', {
         name: payload.name,
         email: payload.email,
         password: payload.password
@@ -10,7 +10,7 @@ export const registerUser = async (payload) => {
 }
 
 export const loginUser = async (credentials) => {
-    const response = await api.post('/api/auth/login', {
+    const response = await api.post('/auth/login', {
         email: credentials.email,
         password: credentials.password
     })
@@ -18,5 +18,5 @@ export const loginUser = async (credentials) => {
 }
 
 export const logoutUser = () => {
-    return api.post('/api/auth/logout')
+    return api.post('/auth/logout')
 }

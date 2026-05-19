@@ -172,5 +172,22 @@ export const useBankSoalStore = defineStore('bankSoal', {
     clearSuccess() {
       this.success = null
     },
+
+    async importSoalFromExcel(formData) {
+      this.isLoading = true
+      this.error = null
+      this.success = null
+
+      try {
+        const response = await bankSoalService.importSoalFromExcel(formData)
+        this.success = 'Soal berhasil diimpor dari Excel'
+        return response
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Gagal mengimpor soal dari Excel'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
   },
 })

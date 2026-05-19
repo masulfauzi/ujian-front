@@ -3,7 +3,7 @@ import api from './api'
 export const mapelService = {
   getMapelList: async (page = 1, pageSize = 10) => {
     try {
-      const response = await api.get('/api/mapel', {
+      const response = await api.get('/mapel', {
         params: { page, page_size: pageSize }
       })
       return response.data
@@ -14,7 +14,7 @@ export const mapelService = {
 
   getMapelById: async (id) => {
     try {
-      const response = await api.get(`/api/mapel/${id}`)
+      const response = await api.get(`/mapel/${id}`)
       return response.data
     } catch (error) {
       throw error
@@ -23,7 +23,7 @@ export const mapelService = {
 
   createMapel: async (payload) => {
     try {
-      const response = await api.post('/api/mapel', payload)
+      const response = await api.post('/mapel', payload)
       return response.data
     } catch (error) {
       throw error
@@ -32,7 +32,7 @@ export const mapelService = {
 
   updateMapel: async (id, payload) => {
     try {
-      const response = await api.put(`/api/mapel/${id}`, payload)
+      const response = await api.put(`/mapel/${id}`, payload)
       return response.data
     } catch (error) {
       throw error
@@ -41,7 +41,7 @@ export const mapelService = {
 
   deleteMapel: async (id) => {
     try {
-      const response = await api.delete(`/api/mapel/${id}`)
+      const response = await api.delete(`/mapel/${id}`)
       return response.data
     } catch (error) {
       throw error
@@ -50,7 +50,7 @@ export const mapelService = {
 
   restoreMapel: async (id) => {
     try {
-      const response = await api.patch(`/api/mapel/${id}/restore`)
+      const response = await api.patch(`/mapel/${id}/restore`)
       return response.data
     } catch (error) {
       throw error

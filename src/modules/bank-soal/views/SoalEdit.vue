@@ -51,7 +51,7 @@
             <p class="text-slate-500 text-sm mt-1">{{ formData.nama_bank_soal.length }} / 255 karakter</p>
           </div>
 
-          <!-- Mapel Selection -->
+          <!-- Mapel Selection (Searchable) -->
           <div>
             <label class="block text-sm font-semibold text-slate-900 mb-2">
               Mata Pelajaran <span class="text-red-600">*</span>
@@ -61,7 +61,7 @@
               @update:model-value="formData.id_mapel = $event"
               @blur="validateMapel"
               :options="mapelOptions"
-              :placeholder="'Cari mata pelajaran...'"
+              placeholder="Cari mata pelajaran..."
               :has-error="!!errors.id_mapel" />
             <p v-if="errors.id_mapel" class="text-red-600 text-sm mt-1">{{ errors.id_mapel }}</p>
           </div>
@@ -225,8 +225,8 @@ onMounted(async () => {
 
     if (soal) {
       formData.nama_bank_soal = soal.nama_bank_soal || ''
-      formData.id_mapel = soal.id_mapel
-      formData.jml_soal = soal.jml_soal || ''
+      formData.id_mapel = String(soal.id_mapel ?? soal.mapel_id ?? '')
+      formData.jml_soal = soal.jml_soal ? Number(soal.jml_soal) : ''
       formData.tipe_soal = soal.tipe_soal
       formData.pertanyaan = soal.pertanyaan
       formData.tingkat_kesulitan = soal.tingkat_kesulitan
@@ -248,10 +248,9 @@ onMounted(async () => {
 })
 
 const mapels = computed(() => mapelStore.mapels)
-
 const mapelOptions = computed(() =>
   mapels.value.map(mapel => ({
-    id: mapel.id,
+    id: String(mapel.id),
     label: mapel.nama_mapel
   }))
 )

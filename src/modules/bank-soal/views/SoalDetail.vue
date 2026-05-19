@@ -55,11 +55,25 @@
               Tambah Soal
             </button>
             <button
+              @click="triggerFileInput"
+              class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined">upload_file</span>
+              Import dari Excel
+            </button>
+            <button
               @click="handleBack"
               class="flex-1 border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-3 px-6 rounded-lg transition-colors">
               Kembali
             </button>
           </div>
+
+          <!-- Hidden File Input -->
+          <input
+            ref="fileInput"
+            type="file"
+            accept=".xlsx,.xls"
+            class="hidden"
+            @change="handleFileImport" />
 
           <!-- Daftar Soal Section -->
           <div v-if="soals.length > 0 || isSoalLoading" class="bg-white rounded-lg shadow border border-slate-200 p-6">
@@ -75,10 +89,10 @@
 
             <!-- Soal List -->
             <div v-else class="space-y-4">
-              <div v-for="(soal, index) in soals" :key="soal.id" class="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors">
+              <div v-for="(soal, index) in sortedSoals" :key="soal.id" class="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors">
                 <!-- Soal Number -->
                 <div class="text-sm font-semibold text-slate-600 mb-2">
-                  Soal {{ (soalStore.currentPage - 1) * soalStore.pageSize + index + 1 }}
+                  Soal {{ soal.no_soal }}
                 </div>
 
                 <!-- Pertanyaan -->
@@ -237,6 +251,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useBankSoalStore } from '@/stores/bankSoal'
 import { useMapelStore } from '@/stores/mapel'
 import { useSoalStore } from '@/stores/soal'
+import { soalService } from '@/services/soalService'
 
 const route = useRoute()
 const router = useRouter()
@@ -246,6 +261,8 @@ const soalStore = useSoalStore()
 const soalId = route.params.id
 
 const error = ref(null)
+const fileInput = ref(null)
+const isImporting = ref(false)
 
 const isLoading = computed(() => bankSoalStore.isLoading)
 const selectedSoal = computed(() => bankSoalStore.selectedSoal)
@@ -258,6 +275,9 @@ const mapelNama = computed(() => {
 })
 
 const soals = computed(() => soalStore.soals)
+const sortedSoals = computed(() => {
+  return [...soals.value].sort((a, b) => a.no_soal - b.no_soal)
+})
 const isSoalLoading = computed(() => soalStore.isLoading)
 const soalError = computed(() => soalStore.error)
 const totalPages = computed(() => soalStore.totalPages)
@@ -310,6 +330,63 @@ const formatDate = (dateString) => {
 const handleSoalPageChange = async (page) => {
   if (page >= 1 && page <= totalPages.value) {
     await soalStore.fetchSoalByBankId(soalId, page)
+  }
+}
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const handleFileImport = async (event) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']
+  if (!validTypes.includes(file.type)) {
+    error.value = 'Format file tidak valid. Gunakan file Excel (.xlsx atau .xls)'
+    return
+  }
+
+  isImporting.value = true
+  error.value = null
+
+  try {
+    const response = await soalService.importSoalFromExcel(soalId, file)
+
+    if (response && response.data) {
+      const importResult = response.data
+      error.value = null
+
+      // Tampilkan summary import
+      let successMessage = `Import soal berhasil!\n`
+      successMessage += `Total diproses: ${importResult.total_processed}\n`
+      successMessage += `Berhasil: ${importResult.total_success}\n`
+      successMessage += `Gagal: ${importResult.total_failed}`
+
+      if (importResult.total_failed > 0 && importResult.errors?.length > 0) {
+        successMessage += `\n\nError:\n`
+        importResult.errors.slice(0, 3).forEach(err => {
+          successMessage += `- ${err}\n`
+        })
+        if (importResult.errors.length > 3) {
+          successMessage += `... dan ${importResult.errors.length - 3} error lainnya`
+        }
+      }
+
+      alert(successMessage)
+
+      // Reload soal list
+      await soalStore.fetchSoalByBankId(soalId, 1)
+
+      // Reset file input
+      if (fileInput.value) {
+        fileInput.value.value = ''
+      }
+    }
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || 'Gagal mengimport soal dari Excel'
+  } finally {
+    isImporting.value = false
   }
 }
 

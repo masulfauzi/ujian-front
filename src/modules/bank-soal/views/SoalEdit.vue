@@ -57,13 +57,13 @@
               Mata Pelajaran <span class="text-red-600">*</span>
             </label>
             <SearchableSelect
-              :model-value="formData.mapel_id"
-              @update:model-value="formData.mapel_id = $event"
+              :model-value="formData.id_mapel"
+              @update:model-value="formData.id_mapel = $event"
               @blur="validateMapel"
               :options="mapelOptions"
               placeholder="Cari mata pelajaran..."
-              :has-error="!!errors.mapel_id" />
-            <p v-if="errors.mapel_id" class="text-red-600 text-sm mt-1">{{ errors.mapel_id }}</p>
+              :has-error="!!errors.id_mapel" />
+            <p v-if="errors.id_mapel" class="text-red-600 text-sm mt-1">{{ errors.id_mapel }}</p>
           </div>
 
           <!-- Jumlah Soal -->
@@ -195,7 +195,7 @@ const error = ref(null)
 
 const formData = reactive({
   nama_bank_soal: '',
-  mapel_id: '',
+  id_mapel: '',
   jml_soal: '',
   tipe_soal: 'pilihan_ganda',
   pertanyaan: 'Bank Soal',
@@ -208,7 +208,7 @@ const pilihanJawaban = reactive([])
 
 const errors = reactive({
   nama_bank_soal: '',
-  mapel_id: '',
+  id_mapel: '',
   jml_soal: '',
   tipe_soal: '',
   pertanyaan: '',
@@ -225,8 +225,7 @@ onMounted(async () => {
 
     if (soal) {
       formData.nama_bank_soal = soal.nama_bank_soal || ''
-      // Support existing soal detail payloads that may return either id_mapel or mapel_id.
-      formData.mapel_id = String(soal.id_mapel ?? soal.mapel_id ?? '')
+      formData.id_mapel = String(soal.id_mapel ?? soal.mapel_id ?? '')
       formData.jml_soal = soal.jml_soal ? Number(soal.jml_soal) : ''
       formData.tipe_soal = soal.tipe_soal
       formData.pertanyaan = soal.pertanyaan
@@ -264,9 +263,9 @@ const validateNamaBankSoal = () => {
 }
 
 const validateMapel = () => {
-  errors.mapel_id = ''
-  if (!formData.mapel_id) {
-    errors.mapel_id = 'Mata pelajaran wajib dipilih'
+  errors.id_mapel = ''
+  if (!formData.id_mapel) {
+    errors.id_mapel = 'Mata pelajaran wajib dipilih'
   }
 }
 
@@ -301,7 +300,7 @@ const validateForm = () => {
   validateNamaBankSoal()
   validateMapel()
   validateJmlSoal()
-  return !errors.nama_bank_soal && !errors.mapel_id && !errors.jml_soal
+  return !errors.nama_bank_soal && !errors.id_mapel && !errors.jml_soal
 }
 
 const getTipeSoalLabel = (tipe) => {
@@ -325,7 +324,7 @@ const handleSubmit = async () => {
   try {
     const payload = {
       nama_bank_soal: formData.nama_bank_soal.trim(),
-      id_mapel: formData.mapel_id,
+      id_mapel: formData.id_mapel,
       jml_soal: parseInt(formData.jml_soal)
     }
 

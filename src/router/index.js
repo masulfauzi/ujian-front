@@ -4,6 +4,7 @@ import { authRoutes } from '../modules/auth/routes'
 import { bankSoalRoutes } from '../modules/bank-soal/routes'
 import { mapelRoutes } from '../modules/mapel/routes'
 import { jurusanRoutes } from '../modules/jurusan/routes'
+import { kelasRoutes } from '../modules/kelas/routes'
 import { setupAuthGuards } from './guards'
 
 const routes = [
@@ -12,6 +13,7 @@ const routes = [
     ...bankSoalRoutes,
     ...mapelRoutes,
     ...jurusanRoutes,
+    ...kelasRoutes,
     ...authRoutes,
 ]
 

@@ -65,6 +65,16 @@
                 <span class="material-symbols-outlined">apartment</span>
                 <span class="font-label-md text-label-md">Jurusan</span>
             </router-link>
+            <router-link to="/admin/kelas"
+                :class="[
+                    'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                    isActivePath('/admin/kelas')
+                        ? 'bg-sky-50 text-sky-600'
+                        : 'text-slate-600 hover:bg-slate-50 transition-all'
+                ]">
+                <span class="material-symbols-outlined">meeting_room</span>
+                <span class="font-label-md text-label-md">Kelas</span>
+            </router-link>
             <router-link to="/admin/bank-soal"
                 :class="[
                     'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',

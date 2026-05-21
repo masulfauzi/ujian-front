@@ -13,7 +13,10 @@
         @keydown.arrow-up.prevent="highlightPrev"
         :placeholder="selectedLabel || placeholder"
         class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all bg-white cursor-pointer"
-        :class="{ 'border-red-500 focus:ring-red-500': hasError }">
+        :class="[
+          { 'border-red-500 focus:ring-red-500': hasError },
+          modelValue ? 'text-slate-900 font-semibold' : 'text-slate-400'
+        ]">
       <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
         <span class="material-symbols-outlined text-xl">expand_more</span>
       </div>

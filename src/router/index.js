@@ -6,6 +6,7 @@ import { mapelRoutes } from '../modules/mapel/routes'
 import { jurusanRoutes } from '../modules/jurusan/routes'
 import { kelasRoutes } from '../modules/kelas/routes'
 import { pesertaRoutes } from '../modules/peserta/routes'
+import { jadwalRoutes } from '../modules/jadwal/routes'
 import { setupAuthGuards } from './guards'
 
 const routes = [
@@ -16,6 +17,7 @@ const routes = [
     ...jurusanRoutes,
     ...kelasRoutes,
     ...pesertaRoutes,
+    ...jadwalRoutes,
     ...authRoutes,
 ]
 

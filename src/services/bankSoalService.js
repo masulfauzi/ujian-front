@@ -1,6 +1,19 @@
 import api from './api'
 
 export const bankSoalService = {
+  getBankSoalList: async (page = 1, pageSize = 10) => {
+    try {
+      const params = {
+        page,
+        page_size: pageSize
+      }
+      const response = await api.get('/bank-soal', { params })
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
   getSoalList: async (page = 1, pageSize = 10, filters = {}) => {
     try {
       const params = {

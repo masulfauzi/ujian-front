@@ -307,41 +307,30 @@ const handleAngkatanChange = async () => {
 }
 
 const handleJurusanChange = async () => {
-  formData.selectedKelasIds = []
   await loadKelas()
 }
 
 const loadKelas = async () => {
   if (formData.angkatan && formData.id_jurusan.length > 0) {
     try {
-      // Load kelas untuk semua jurusan yang dipilih - gunakan id_jurusan dari array
+      // Load kelas untuk semua jurusan yang dipilih
       const allKelas = new Map()
 
-      for (const selectedId of formData.id_jurusan) {
-        // Cari id_jurusan value dari selectedJurusanData
-        const jurusanItem = selectedJurusanData.value.find(j => j.id_jurusan === selectedId || j.id === selectedId)
-        if (!jurusanItem) continue
-
+      for (const jurusanId of formData.id_jurusan) {
         const response = await kelasStore.fetchKelasList(1, 100, {
           tingkat: formData.angkatan,
-          id_jurusan: jurusanItem.id_jurusan,
+          id_jurusan: jurusanId,
         })
 
-        console.log('Kelas response:', response)
-
-        // Handle response structure - could be array or have .data property
-        let kelasList = Array.isArray(response) ? response : (response?.data || [])
-        console.log('Kelas list:', kelasList)
-
+        // Combine kelas dari semua jurusan (avoid duplicates)
+        const kelasList = response.data || []
         kelasList.forEach(k => {
           allKelas.set(k.id, k)
         })
       }
 
       // Update store dengan combined kelas
-      const combinedKelas = Array.from(allKelas.values())
-      console.log('Combined kelas:', combinedKelas)
-      kelasStore.kelass = combinedKelas
+      kelasStore.kelass = Array.from(allKelas.values())
       showKelasOptions.value = true
     } catch (err) {
       console.error('Error loading kelas:', err)

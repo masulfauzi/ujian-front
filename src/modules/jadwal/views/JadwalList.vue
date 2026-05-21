@@ -57,6 +57,7 @@
           <thead class="bg-slate-50 border-b border-slate-200">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">No.</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nama Ujian</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nama Bank Soal</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Waktu Mulai</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Waktu Selesai</th>
@@ -68,7 +69,8 @@
               <td class="px-6 py-4 text-slate-900">
                 {{ (currentPage - 1) * pageSize + index + 1 }}
               </td>
-              <td class="px-6 py-4 text-slate-900 font-medium">{{ jadwal.nama_bank_soal }}</td>
+              <td class="px-6 py-4 text-slate-900 font-medium">{{ jadwal.nama_ujian }}</td>
+              <td class="px-6 py-4 text-slate-900">{{ jadwal.nama_bank_soal }}</td>
               <td class="px-6 py-4 text-slate-900">{{ formatDateTime(jadwal.wkt_mulai) }}</td>
               <td class="px-6 py-4 text-slate-900">{{ formatDateTime(jadwal.wkt_selesai) }}</td>
               <td class="px-6 py-4 text-center">

@@ -24,6 +24,21 @@
       </div>
 
       <form v-else @submit.prevent="handleSubmit" class="bg-white rounded-lg shadow border border-slate-200 p-6 space-y-6">
+        <!-- Nama Ujian Field -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-900 mb-2">
+            Nama Ujian <span class="text-red-600">*</span>
+          </label>
+          <input
+            v-model="formData.nama_ujian"
+            @blur="validateNamaUjian"
+            type="text"
+            placeholder="Masukkan nama ujian"
+            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+            :class="{ 'border-red-500 focus:ring-red-500': errors.nama_ujian }">
+          <p v-if="errors.nama_ujian" class="text-red-600 text-sm mt-1">{{ errors.nama_ujian }}</p>
+        </div>
+
         <!-- Bank Soal Field -->
         <div>
           <label class="block text-sm font-semibold text-slate-900 mb-2">
@@ -186,6 +201,7 @@ const bankSoals = ref([])
 const selectedJurusanData = ref([])
 
 const formData = reactive({
+  nama_ujian: '',
   id_bank_soal: '',
   wkt_mulai: '',
   wkt_selesai: '',
@@ -195,6 +211,7 @@ const formData = reactive({
 })
 
 const errors = reactive({
+  nama_ujian: '',
   id_bank_soal: '',
   wkt_mulai: '',
   wkt_selesai: '',
@@ -225,6 +242,7 @@ onMounted(async () => {
       throw new Error('Data jadwal tidak ditemukan')
     }
 
+    formData.nama_ujian = jadwalData.nama_ujian || ''
     formData.id_bank_soal = jadwalData.id_bank_soal || ''
     formData.wkt_mulai = jadwalData.wkt_mulai ? toDatetimeLocal(jadwalData.wkt_mulai) : ''
     formData.wkt_selesai = jadwalData.wkt_selesai ? toDatetimeLocal(jadwalData.wkt_selesai) : ''
@@ -275,6 +293,10 @@ const jurusanOptions = computed(() =>
 const kelasOptions = computed(() =>
   kelasStore.kelass.map(k => ({ id: k.id, label: k.nama_kelas }))
 )
+
+const validateNamaUjian = () => {
+  errors.nama_ujian = formData.nama_ujian ? '' : 'Nama ujian wajib diisi'
+}
 
 const validateBankSoal = () => {
   errors.id_bank_soal = formData.id_bank_soal ? '' : 'Bank soal wajib dipilih'
@@ -343,6 +365,7 @@ const loadKelas = async () => {
 
 const validateForm = () => {
   let isValid = true
+  errors.nama_ujian = ''
   errors.id_bank_soal = ''
   errors.wkt_mulai = ''
   errors.wkt_selesai = ''
@@ -350,6 +373,10 @@ const validateForm = () => {
   errors.id_jurusan = ''
   errors.selectedKelasIds = ''
 
+  if (!formData.nama_ujian) {
+    errors.nama_ujian = 'Nama ujian wajib diisi'
+    isValid = false
+  }
   if (!formData.id_bank_soal) {
     errors.id_bank_soal = 'Bank soal wajib dipilih'
     isValid = false
@@ -391,6 +418,7 @@ const handleSubmit = async () => {
 
   try {
     const jadwalPayload = {
+      nama_ujian: formData.nama_ujian,
       id_bank_soal: formData.id_bank_soal,
       wkt_mulai: formatDatetime(formData.wkt_mulai),
       wkt_selesai: formatDatetime(formData.wkt_selesai),

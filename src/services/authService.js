@@ -3,6 +3,7 @@ import api from './api'
 export const registerUser = async (payload) => {
     const response = await api.post('/auth/register', {
         name: payload.name,
+        username: payload.username,
         email: payload.email,
         password: payload.password
     })
@@ -11,7 +12,7 @@ export const registerUser = async (payload) => {
 
 export const loginUser = async (credentials) => {
     const response = await api.post('/auth/login', {
-        email: credentials.email,
+        username: credentials.username,
         password: credentials.password
     })
     return response.data

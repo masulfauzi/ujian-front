@@ -47,6 +47,25 @@
                         <p v-if="errors.name" class="text-red-600 font-label-sm mt-1">{{ errors.name }}</p>
                     </div>
 
+                    <!-- Username Field -->
+                    <div class="space-y-xs">
+                        <label class="font-label-md text-on-surface-variant block ml-1">Username</label>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary-container transition-colors">
+                                <span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+                            </div>
+                            <input
+                                v-model="formData.username"
+                                @blur="validateField('username')"
+                                :class="['w-full pl-12 pr-4 py-3 bg-surface-container-low border rounded-lg font-body-md focus:ring-4 focus:ring-primary-container/10 outline-none transition-all placeholder:text-outline-variant',
+                                errors.username ? 'border-red-500 focus:border-red-500' : 'border-outline-variant focus:border-primary-container'
+                                ]"
+                                placeholder="Enter your username" type="text" />
+                        </div>
+                        <p v-if="errors.username" class="text-red-600 font-label-sm mt-1">{{ errors.username }}</p>
+                    </div>
+
                     <!-- Email Field -->
                     <div class="space-y-xs">
                         <label class="font-label-md text-on-surface-variant block ml-1">Email Address</label>
@@ -173,6 +192,7 @@ const authStore = useAuthStore()
 
 const formData = ref({
     name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -187,40 +207,46 @@ const showConfirmPassword = ref(false)
 const validateField = (field) => {
     switch (field) {
         case 'name':
+            errors.value.name = ''
             if (!formData.value.name.trim()) {
                 errors.value.name = 'Name is required'
             } else if (formData.value.name.trim().length < 3) {
                 errors.value.name = 'Name must be at least 3 characters'
-            } else {
-                delete errors.value.name
+            }
+            break
+        case 'username':
+            errors.value.username = ''
+            if (!formData.value.username.trim()) {
+                errors.value.username = 'Username is required'
+            } else if (formData.value.username.trim().length < 3) {
+                errors.value.username = 'Username must be at least 3 characters'
+            } else if (!/^[a-zA-Z0-9_]+$/.test(formData.value.username)) {
+                errors.value.username = 'Username can only contain letters, numbers, and underscores'
             }
             break
         case 'email':
+            errors.value.email = ''
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
             if (!formData.value.email.trim()) {
                 errors.value.email = 'Email is required'
             } else if (!emailRegex.test(formData.value.email)) {
                 errors.value.email = 'Please enter a valid email address'
-            } else {
-                delete errors.value.email
             }
             break
         case 'password':
+            errors.value.password = ''
             if (!formData.value.password) {
                 errors.value.password = 'Password is required'
             } else if (formData.value.password.length < 6) {
                 errors.value.password = 'Password must be at least 6 characters'
-            } else {
-                delete errors.value.password
             }
             break
         case 'confirmPassword':
+            errors.value.confirmPassword = ''
             if (!formData.value.confirmPassword) {
                 errors.value.confirmPassword = 'Confirm password is required'
             } else if (formData.value.confirmPassword !== formData.value.password) {
                 errors.value.confirmPassword = 'Passwords do not match'
-            } else {
-                delete errors.value.confirmPassword
             }
             break
     }
@@ -228,6 +254,7 @@ const validateField = (field) => {
 
 const isFormValid = () => {
     validateField('name')
+    validateField('username')
     validateField('email')
     validateField('password')
     validateField('confirmPassword')
@@ -235,10 +262,12 @@ const isFormValid = () => {
     if (!formData.value.agreeTerms) {
         errors.value.terms = 'You must agree to the Terms & Conditions'
     } else {
-        delete errors.value.terms
+        errors.value.terms = ''
     }
 
-    return Object.keys(errors.value).length === 0
+    // Count only non-empty errors
+    const errorCount = Object.values(errors.value).filter(error => error && error.trim()).length
+    return errorCount === 0
 }
 
 const handleRegister = async () => {
@@ -246,13 +275,24 @@ const handleRegister = async () => {
     successMessage.value = ''
 
     if (!isFormValid()) {
-        errors.value.general = 'Please fix the errors above'
+        // Show specific error messages instead of generic message
+        const errorMessages = Object.entries(errors.value)
+            .filter(([key, value]) => key !== 'general' && value)
+            .map(([key, value]) => value)
+
+        if (errorMessages.length > 0) {
+            errors.value.general = errorMessages.join(', ')
+        } else {
+            errors.value.general = 'Please fix the errors above'
+        }
+        console.log('Validation errors:', errors.value)
         return
     }
 
     try {
         const response = await authStore.register({
             name: formData.value.name,
+            username: formData.value.username,
             email: formData.value.email,
             password: formData.value.password
         })
@@ -262,6 +302,7 @@ const handleRegister = async () => {
         // Reset form
         formData.value = {
             name: '',
+            username: '',
             email: '',
             password: '',
             confirmPassword: '',

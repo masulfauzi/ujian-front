@@ -61,6 +61,10 @@
                 <p class="text-sm font-medium text-slate-600">Waktu Selesai</p>
                 <p class="text-lg text-slate-900 font-semibold mt-1">{{ formatDateTime(jadwalData.wkt_selesai) }}</p>
               </div>
+              <div>
+                <p class="text-sm font-medium text-slate-600">Durasi</p>
+                <p class="text-lg text-slate-900 font-semibold mt-1">{{ jadwalData.durasi }} menit</p>
+              </div>
             </div>
           </div>
 

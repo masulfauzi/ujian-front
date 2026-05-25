@@ -159,12 +159,14 @@ import { onMounted, ref, computed, watch } from 'vue'
 import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { usePesertaStore } from '@/stores/peserta'
+import { useDialog } from '@/composables/useDialog'
 import { useKelasStore } from '@/stores/kelas'
 import { useRouter } from 'vue-router'
 
 const pesertaStore = usePesertaStore()
 const kelasStore = useKelasStore()
 const router = useRouter()
+const { $confirm } = useDialog()
 const currentPage = ref(1)
 const filterKelasId = ref('')
 
@@ -210,7 +212,7 @@ const handleEdit = (id) => {
 }
 
 const handleDelete = async (id) => {
-  if (confirm('Yakin ingin menghapus peserta ini?')) {
+  if (await $confirm('Yakin ingin menghapus peserta ini?', { title: 'Konfirmasi Hapus' })) {
     try {
       await pesertaStore.deletePeserta(id)
       await pesertaStore.fetchPesertaList(currentPage.value, pageSize.value, { id_kelas: filterKelasId.value })

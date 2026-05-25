@@ -145,7 +145,7 @@ onMounted(() => {
     // Format current date
     const today = new Date()
     const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    currentDate.value = today.toLocaleDateString('en-US', options)
+    currentDate.value = today.toLocaleDateString('id-ID', options)
 
     // Fetch stats
     adminStore.fetchStats()

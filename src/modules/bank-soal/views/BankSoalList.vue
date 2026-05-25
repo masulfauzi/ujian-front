@@ -220,6 +220,7 @@ import { useRouter } from 'vue-router'
 const bankSoalStore = useBankSoalStore()
 const mapelStore = useMapelStore()
 const router = useRouter()
+const { $confirm } = useDialog()
 
 const currentPage = ref(1)
 const searchText = ref('')
@@ -268,7 +269,7 @@ const handleEdit = (id) => {
 }
 
 const handleDelete = async (id) => {
-  if (confirm('Yakin ingin menghapus soal ini?')) {
+  if (await $confirm('Yakin ingin menghapus soal ini?', { title: 'Konfirmasi Hapus' })) {
     try {
       await bankSoalStore.deleteSoal(id)
       await bankSoalStore.fetchSoalList(currentPage.value, {})

@@ -160,9 +160,11 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useKelasStore } from '@/stores/kelas'
 import { useRouter } from 'vue-router'
+import { useDialog } from '@/composables/useDialog'
 
 const kelasStore = useKelasStore()
 const router = useRouter()
+const { $confirm } = useDialog()
 const currentPage = ref(1)
 const filterTingkat = ref('')
 
@@ -203,7 +205,7 @@ const handleEdit = (id) => {
 }
 
 const handleDelete = async (id) => {
-  if (confirm('Yakin ingin menghapus kelas ini?')) {
+  if (await $confirm('Yakin ingin menghapus kelas ini?', { title: 'Konfirmasi Hapus' })) {
     try {
       await kelasStore.deleteKelas(id)
       await kelasStore.fetchKelasList(currentPage.value, pageSize.value, { tingkat: filterTingkat.value })

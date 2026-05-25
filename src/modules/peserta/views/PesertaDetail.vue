@@ -112,10 +112,12 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePesertaStore } from '@/stores/peserta'
+import { useDialog } from '@/composables/useDialog'
 
 const route = useRoute()
 const router = useRouter()
 const pesertaStore = usePesertaStore()
+const { $confirm } = useDialog()
 const pesertaId = route.params.id
 
 const isLoading = computed(() => pesertaStore.isLoading)
@@ -135,7 +137,7 @@ const handleEdit = () => {
 }
 
 const handleDelete = async () => {
-  if (confirm('Yakin ingin menghapus peserta ini? Tindakan ini tidak dapat dibatalkan.')) {
+  if (await $confirm('Yakin ingin menghapus peserta ini? Tindakan ini tidak dapat dibatalkan.', { title: 'Konfirmasi Hapus' })) {
     try {
       await pesertaStore.deletePeserta(pesertaId)
       router.push({ name: 'peserta.list' })
@@ -159,7 +161,7 @@ const formatDate = (dateString) => {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     })
   } catch {
     return dateString

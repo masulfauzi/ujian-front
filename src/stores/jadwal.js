@@ -10,7 +10,9 @@ export const useJadwalStore = defineStore('jadwal', {
     pageSize: 10,
     selectedJadwal: null,
     jadwalKelas: [],
+    jadwalAktif: [],
     isLoading: false,
+    isLoadingAktif: false,
     error: null,
     success: null,
   }),
@@ -20,6 +22,21 @@ export const useJadwalStore = defineStore('jadwal', {
   },
 
   actions: {
+    async fetchJadwalAktifHariIni() {
+      this.isLoadingAktif = true
+      this.error = null
+      try {
+        const response = await jadwalService.getJadwalAktifHariIni()
+        this.jadwalAktif = response.data || []
+        return this.jadwalAktif
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Gagal mengambil jadwal aktif hari ini'
+        throw err
+      } finally {
+        this.isLoadingAktif = false
+      }
+    },
+
     async fetchJadwalList(page = 1, pageSize = 10) {
       this.isLoading = true
       this.error = null

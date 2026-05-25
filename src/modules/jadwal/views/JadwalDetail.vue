@@ -152,13 +152,12 @@ onMounted(async () => {
 
 const formatDateTime = (dateTime) => {
   if (!dateTime) return '-'
-  const date = new Date(dateTime)
-  return date.toLocaleString('id-ID', {
+  return new Date(dateTime).toLocaleString('id-ID', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 

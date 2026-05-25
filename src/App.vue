@@ -22,6 +22,7 @@
     <div :class="!isLoginPage && !isDashboardPage ? 'pt-16 bg-background' : ''" class="flex-grow flex flex-col">
       <router-view />
     </div>
+    <AppDialog />
     <footer
       class="bg-slate-50 border-t border-slate-200 w-full py-8 mt-auto text-sm font-['Plus_Jakarta_Sans'] text-slate-500">
       <div class="flex flex-col md:flex-row justify-between items-center px-8 space-y-4 md:space-y-0 max-w-7xl mx-auto">
@@ -47,8 +48,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import AppDialog from '@/components/AppDialog.vue'
 
 const route = useRoute()
 const isLoginPage = computed(() => route.path === '/login')
-const isDashboardPage = computed(() => route.path.startsWith('/dashboard') || route.path.startsWith('/admin'))
+const isDashboardPage = computed(() => route.path.startsWith('/dashboard') || route.path.startsWith('/admin') || route.path.startsWith('/schedule') || route.path.startsWith('/ujian'))
 </script>

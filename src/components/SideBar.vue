@@ -24,7 +24,7 @@
             <router-link to="/schedule"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">
                 <span class="material-symbols-outlined">calendar_today</span>
-                <span class="font-label-md text-label-md">Exam Schedule</span>
+                <span class="font-label-md text-label-md">Jadwal Ujian</span>
             </router-link>
             <router-link to="/results"
                 class="flex items-center gap-3 text-slate-600 hover:bg-slate-50 rounded-lg px-4 py-3 transition-all hover:translate-x-1 duration-200">

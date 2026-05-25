@@ -115,10 +115,12 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMapelStore } from '@/stores/mapel'
+import { useDialog } from '@/composables/useDialog'
 
 const route = useRoute()
 const router = useRouter()
 const mapelStore = useMapelStore()
+const { $confirm } = useDialog()
 const mapelId = route.params.id
 
 const isLoading = computed(() => mapelStore.isLoading)
@@ -138,7 +140,7 @@ const handleEdit = () => {
 }
 
 const handleDelete = async () => {
-  if (confirm('Yakin ingin menghapus mapel ini? Tindakan ini tidak dapat dibatalkan.')) {
+  if (await $confirm('Yakin ingin menghapus mapel ini? Tindakan ini tidak dapat dibatalkan.', { title: 'Konfirmasi Hapus' })) {
     try {
       await mapelStore.deleteMapel(mapelId)
       router.push({ name: 'mapel.list' })
@@ -162,7 +164,7 @@ const formatDate = (dateString) => {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     })
   } catch {
     return dateString

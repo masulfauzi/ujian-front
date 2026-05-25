@@ -64,7 +64,7 @@ const updateTime = (event) => {
   const newTime = event.target.value
   if (!newTime) return
 
-  const date = dateValue.value || new Date().toISOString().split('T')[0]
+  const date = dateValue.value || new Date().toLocaleDateString('sv-SE')
   const datetime = `${date}T${newTime}`
   emit('update:modelValue', datetime)
 }

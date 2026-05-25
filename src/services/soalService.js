@@ -61,5 +61,14 @@ export const soalService = {
     } catch (error) {
       throw error
     }
-  }
+  },
+
+  getSoalById: async (id) => {
+    try {
+      const response = await api.get(`/soal/${id}`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
 }

@@ -249,6 +249,7 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankSoalStore } from '@/stores/bankSoal'
+import { useDialog } from '@/composables/useDialog'
 import { useMapelStore } from '@/stores/mapel'
 import { useSoalStore } from '@/stores/soal'
 import { soalService } from '@/services/soalService'
@@ -257,6 +258,7 @@ const route = useRoute()
 const router = useRouter()
 const bankSoalStore = useBankSoalStore()
 const mapelStore = useMapelStore()
+const { $alert } = useDialog()
 const soalStore = useSoalStore()
 const soalId = route.params.id
 
@@ -320,7 +322,7 @@ const formatDate = (dateString) => {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     })
   } catch {
     return dateString
@@ -373,7 +375,7 @@ const handleFileImport = async (event) => {
         }
       }
 
-      alert(successMessage)
+      await $alert(successMessage, { title: 'Berhasil', type: 'success' })
 
       // Reload soal list
       await soalStore.fetchSoalByBankId(soalId, 1)

@@ -97,10 +97,12 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJurusanStore } from '@/stores/jurusan'
+import { useDialog } from '@/composables/useDialog'
 
 const route = useRoute()
 const router = useRouter()
 const jurusanStore = useJurusanStore()
+const { $confirm } = useDialog()
 const jurusanId = route.params.id
 
 const isLoading = computed(() => jurusanStore.isLoading)
@@ -120,7 +122,7 @@ const handleEdit = () => {
 }
 
 const handleDelete = async () => {
-  if (confirm('Yakin ingin menghapus jurusan ini? Tindakan ini tidak dapat dibatalkan.')) {
+  if (await $confirm('Yakin ingin menghapus jurusan ini? Tindakan ini tidak dapat dibatalkan.', { title: 'Konfirmasi Hapus' })) {
     try {
       await jurusanStore.deleteJurusan(jurusanId)
       router.push({ name: 'jurusan.list' })
@@ -144,7 +146,7 @@ const formatDate = (dateString) => {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     })
   } catch {
     return dateString

@@ -150,9 +150,11 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useMapelStore } from '@/stores/mapel'
 import { useRouter } from 'vue-router'
+import { useDialog } from '@/composables/useDialog'
 
 const mapelStore = useMapelStore()
 const router = useRouter()
+const { $confirm } = useDialog()
 const currentPage = ref(1)
 const deleteConfirmId = ref(null)
 
@@ -193,7 +195,7 @@ const handleEdit = (id) => {
 }
 
 const handleDelete = async (id) => {
-  if (confirm('Yakin ingin menghapus mapel ini?')) {
+  if (await $confirm('Yakin ingin menghapus mapel ini?', { title: 'Konfirmasi Hapus' })) {
     try {
       await mapelStore.deleteMapel(id)
       await mapelStore.fetchMapelList(currentPage.value)

@@ -140,9 +140,11 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useJurusanStore } from '@/stores/jurusan'
 import { useRouter } from 'vue-router'
+import { useDialog } from '@/composables/useDialog'
 
 const jurusanStore = useJurusanStore()
 const router = useRouter()
+const { $confirm } = useDialog()
 const currentPage = ref(1)
 
 onMounted(async () => {
@@ -182,7 +184,7 @@ const handleEdit = (id) => {
 }
 
 const handleDelete = async (id) => {
-  if (confirm('Yakin ingin menghapus jurusan ini?')) {
+  if (await $confirm('Yakin ingin menghapus jurusan ini?', { title: 'Konfirmasi Hapus' })) {
     try {
       await jurusanStore.deleteJurusan(id)
       await jurusanStore.fetchJurusanList(currentPage.value)

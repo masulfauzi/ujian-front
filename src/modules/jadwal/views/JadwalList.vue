@@ -146,9 +146,11 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { useJadwalStore } from '@/stores/jadwal'
 import { useRouter } from 'vue-router'
+import { useDialog } from '@/composables/useDialog'
 
 const jadwalStore = useJadwalStore()
 const router = useRouter()
+const { $confirm } = useDialog()
 const currentPage = ref(1)
 
 onMounted(async () => {
@@ -177,13 +179,12 @@ watch(error, (newVal) => {
 
 const formatDateTime = (dateTime) => {
   if (!dateTime) return '-'
-  const date = new Date(dateTime)
-  return date.toLocaleString('id-ID', {
+  return new Date(dateTime).toLocaleString('id-ID', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -200,7 +201,7 @@ const handleEdit = (id) => {
 }
 
 const handleDelete = async (id) => {
-  if (confirm('Yakin ingin menghapus jadwal ini?')) {
+  if (await $confirm('Yakin ingin menghapus jadwal ini?', { title: 'Konfirmasi Hapus' })) {
     try {
       await jadwalStore.deleteJadwal(id)
       await jadwalStore.fetchJadwalList(currentPage.value, pageSize.value)

@@ -11,6 +11,15 @@ export const jadwalService = {
     }
   },
 
+  getJadwalAktifHariIni: async () => {
+    try {
+      const response = await api.get('/jadwal/aktif/hari-ini')
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
   getJadwalById: async (id) => {
     try {
       const response = await api.get(`/jadwal/${id}`)

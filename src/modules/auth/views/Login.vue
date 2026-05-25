@@ -21,22 +21,22 @@
 
                 <!-- Form -->
                 <form class="space-y-md" @submit.prevent="handleLogin">
-                    <!-- Email Field -->
+                    <!-- Username Field -->
                     <div class="space-y-xs">
-                        <label class="font-label-md text-on-surface-variant block ml-1">Email Address</label>
+                        <label class="font-label-md text-on-surface-variant block ml-1">Username</label>
                         <div class="relative group">
                             <div
                                 class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary-container transition-colors">
-                                <span class="material-symbols-outlined" data-icon="mail">mail</span>
+                                <span class="material-symbols-outlined" data-icon="person">person</span>
                             </div>
                             <input
-                                v-model="form.email"
+                                v-model="form.username"
                                 :class="['w-full pl-12 pr-4 py-3 bg-surface-container-low border rounded-lg font-body-md focus:ring-4 focus:ring-primary-container/10 outline-none transition-all placeholder:text-outline-variant',
-                                errors.email ? 'border-red-500 focus:border-red-500' : 'border-outline-variant focus:border-primary-container'
+                                errors.username ? 'border-red-500 focus:border-red-500' : 'border-outline-variant focus:border-primary-container'
                                 ]"
-                                placeholder="Enter your email" type="email" />
+                                placeholder="Enter your username" type="text" />
                         </div>
-                        <p v-if="errors.email" class="text-red-600 font-label-sm mt-1">{{ errors.email }}</p>
+                        <p v-if="errors.username" class="text-red-600 font-label-sm mt-1">{{ errors.username }}</p>
                     </div>
                     <!-- Password Field -->
                     <div class="space-y-xs">
@@ -116,7 +116,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const form = ref({
-    email: '',
+    username: '',
     password: '',
     rememberMe: false,
 })
@@ -128,8 +128,8 @@ const handleLogin = async () => {
     errors.value = {}
 
     // Validation
-    if (!form.value.email.trim()) {
-        errors.value.email = 'Email is required'
+    if (!form.value.username.trim()) {
+        errors.value.username = 'Username is required'
     }
     if (!form.value.password) {
         errors.value.password = 'Password is required'
@@ -141,7 +141,7 @@ const handleLogin = async () => {
 
     try {
         await authStore.login({
-            email: form.value.email,
+            username: form.value.username,
             password: form.value.password
         })
         router.push('/dashboard')

@@ -22,6 +22,21 @@
       </div>
 
       <form v-else @submit.prevent="handleSubmit" class="bg-white rounded-lg shadow border border-slate-200 p-6 space-y-6">
+        <!-- Nama Ujian Field -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-900 mb-2">
+            Nama Ujian <span class="text-red-600">*</span>
+          </label>
+          <input
+            v-model="formData.nama_ujian"
+            @blur="validateNamaUjian"
+            type="text"
+            placeholder="Masukkan nama ujian"
+            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+            :class="{ 'border-red-500 focus:ring-red-500': errors.nama_ujian }">
+          <p v-if="errors.nama_ujian" class="text-red-600 text-sm mt-1">{{ errors.nama_ujian }}</p>
+        </div>
+
         <!-- Bank Soal Field -->
         <div>
           <label class="block text-sm font-semibold text-slate-900 mb-2">
@@ -63,6 +78,22 @@
             placeholder="Pilih tanggal dan waktu"
             :class="{ 'dp-error': errors.wkt_selesai }" />
           <p v-if="errors.wkt_selesai" class="text-red-600 text-sm mt-1">{{ errors.wkt_selesai }}</p>
+        </div>
+
+        <!-- Durasi Field -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-900 mb-2">
+            Durasi (menit) <span class="text-red-600">*</span>
+          </label>
+          <input
+            v-model.number="formData.durasi"
+            @blur="validateDurasi"
+            type="number"
+            placeholder="Masukkan durasi ujian dalam menit"
+            min="1"
+            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+            :class="{ 'border-red-500 focus:ring-red-500': errors.durasi }">
+          <p v-if="errors.durasi" class="text-red-600 text-sm mt-1">{{ errors.durasi }}</p>
         </div>
 
         <!-- Angkatan Field -->
@@ -180,18 +211,22 @@ const showKelasOptions = ref(false)
 const bankSoals = ref([])
 
 const formData = reactive({
+  nama_ujian: '',
   id_bank_soal: '',
   wkt_mulai: '',
   wkt_selesai: '',
+  durasi: '',
   angkatan: '',
   id_jurusan: [],
   selectedKelasIds: [],
 })
 
 const errors = reactive({
+  nama_ujian: '',
   id_bank_soal: '',
   wkt_mulai: '',
   wkt_selesai: '',
+  durasi: '',
   angkatan: '',
   id_jurusan: '',
   selectedKelasIds: '',
@@ -223,6 +258,10 @@ const kelasOptions = computed(() =>
   kelasStore.kelass.map(k => ({ id: k.id, label: k.nama_kelas }))
 )
 
+const validateNamaUjian = () => {
+  errors.nama_ujian = formData.nama_ujian ? '' : 'Nama ujian wajib diisi'
+}
+
 const validateBankSoal = () => {
   errors.id_bank_soal = formData.id_bank_soal ? '' : 'Bank soal wajib dipilih'
 }
@@ -237,6 +276,15 @@ const validateWktSelesai = () => {
     errors.wkt_selesai = 'Waktu selesai wajib diisi'
   } else if (formData.wkt_mulai && new Date(formData.wkt_selesai) <= new Date(formData.wkt_mulai)) {
     errors.wkt_selesai = 'Waktu selesai harus setelah waktu mulai'
+  }
+}
+
+const validateDurasi = () => {
+  errors.durasi = ''
+  if (!formData.durasi) {
+    errors.durasi = 'Durasi wajib diisi'
+  } else if (formData.durasi < 1) {
+    errors.durasi = 'Durasi harus lebih dari 0 menit'
   }
 }
 
@@ -291,13 +339,19 @@ const loadKelas = async () => {
 
 const validateForm = () => {
   let isValid = true
+  errors.nama_ujian = ''
   errors.id_bank_soal = ''
   errors.wkt_mulai = ''
   errors.wkt_selesai = ''
+  errors.durasi = ''
   errors.angkatan = ''
   errors.id_jurusan = ''
   errors.selectedKelasIds = ''
 
+  if (!formData.nama_ujian) {
+    errors.nama_ujian = 'Nama ujian wajib diisi'
+    isValid = false
+  }
   if (!formData.id_bank_soal) {
     errors.id_bank_soal = 'Bank soal wajib dipilih'
     isValid = false
@@ -311,6 +365,13 @@ const validateForm = () => {
     isValid = false
   } else if (new Date(formData.wkt_selesai) <= new Date(formData.wkt_mulai)) {
     errors.wkt_selesai = 'Waktu selesai harus setelah waktu mulai'
+    isValid = false
+  }
+  if (!formData.durasi) {
+    errors.durasi = 'Durasi wajib diisi'
+    isValid = false
+  } else if (formData.durasi < 1) {
+    errors.durasi = 'Durasi harus lebih dari 0 menit'
     isValid = false
   }
   if (!formData.angkatan) {
@@ -339,9 +400,11 @@ const handleSubmit = async () => {
 
   try {
     const jadwalPayload = {
+      nama_ujian: formData.nama_ujian,
       id_bank_soal: formData.id_bank_soal,
       wkt_mulai: formatDatetime(formData.wkt_mulai),
       wkt_selesai: formatDatetime(formData.wkt_selesai),
+      durasi: formData.durasi,
       tingkat: formData.angkatan,
       id_kelas: formData.selectedKelasIds,
     }

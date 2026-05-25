@@ -31,14 +31,20 @@
           <!-- Bank Soal & Angkatan -->
           <div class="bg-white rounded-lg shadow border border-slate-200 p-6">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Informasi Umum</h2>
-            <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-4">
               <div>
-                <p class="text-sm font-medium text-slate-600">Bank Soal</p>
-                <p class="text-lg text-slate-900 font-semibold mt-1">{{ jadwalData.nama_bank_soal }}</p>
+                <p class="text-sm font-medium text-slate-600">Nama Ujian</p>
+                <p class="text-lg text-slate-900 font-semibold mt-1">{{ jadwalData.nama_ujian }}</p>
               </div>
-              <div>
-                <p class="text-sm font-medium text-slate-600">Angkatan</p>
-                <p class="text-lg text-slate-900 font-semibold mt-1">{{ jadwalData.tingkat }}</p>
+              <div class="grid grid-cols-2 gap-6">
+                <div>
+                  <p class="text-sm font-medium text-slate-600">Bank Soal</p>
+                  <p class="text-lg text-slate-900 font-semibold mt-1">{{ jadwalData.nama_bank_soal }}</p>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-slate-600">Angkatan</p>
+                  <p class="text-lg text-slate-900 font-semibold mt-1">{{ jadwalData.tingkat }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -54,6 +60,10 @@
               <div>
                 <p class="text-sm font-medium text-slate-600">Waktu Selesai</p>
                 <p class="text-lg text-slate-900 font-semibold mt-1">{{ formatDateTime(jadwalData.wkt_selesai) }}</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-slate-600">Durasi</p>
+                <p class="text-lg text-slate-900 font-semibold mt-1">{{ jadwalData.durasi }} menit</p>
               </div>
             </div>
           </div>

@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
@@ -96,22 +96,15 @@ const authStore = useAuthStore()
 const router = useRouter()
 const isDropdownOpen = ref(false)
 
-const userName = ref('')
-const userEmail = ref('')
-const userRole = ref('')
 const userAvatar = ref('https://lh3.googleusercontent.com/aida-public/AB6AXuB9U5KURX3eumGQKeub8bUR7L74sraVdj5vIY-omMSvEMaGBJldTzEYfYTvmZppjymd35ebrZbDV3aifEC1b1mYRpgJ2zGe0qL_VWoku_0phkarPtEIQU8GRxUXoipSKtyNOZbHsH-I00WvpZcGt8JMEM1aDNdjpr4l_alp-GAOY3cOwO89_8BRSmRjB5x1XApXCbAqU2m2CVFsxWpsUr7Naw8F9zgR3DS_INZ4Lgmgq3NEfpt_10Qc189HaundOan0GJ7UbJwbkwpM')
 
 const isAdmin = computed(() => authStore.currentUser?.role === 'admin')
+const userName = computed(() => authStore.displayName)
+const userEmail = computed(() => authStore.currentUser?.email || '')
+const userRole = computed(() => isAdmin.value ? 'Administrator' : 'Peserta')
 
 const pageTitle = computed(() => {
     return isAdmin.value ? 'Exam Management' : 'Student Dashboard'
-})
-
-onMounted(() => {
-    // Set user info from auth store
-    userName.value = authStore.currentUser?.name || 'User'
-    userEmail.value = authStore.currentUser?.email || 'user@example.com'
-    userRole.value = isAdmin.value ? 'Administrator' : 'Student'
 })
 
 const handleLogout = () => {

@@ -1,13 +1,15 @@
 import { defineStore } from 'pinia'
-import { clearToken, decodeToken, getToken, setToken } from '../services/token'
+import { clearToken, clearUserName, decodeToken, getToken, getUserName, setToken, setUserName } from '../services/token'
 import { registerUser, loginUser } from '../services/authService'
 
 export const useAuthStore = defineStore('auth', {
     state: () => {
         const token = getToken()
+        const decoded = decodeToken(token)
         return {
             token,
-            user: decodeToken(token),
+            user: decoded,
+            name: getUserName() || decoded?.name || null,
             isLoading: false,
             error: null,
         }
@@ -17,13 +19,18 @@ export const useAuthStore = defineStore('auth', {
         isAuthenticated: (state) => !!state.token && !!state.user,
         currentUser: (state) => state.user,
         authToken: (state) => state.token,
+        displayName: (state) => state.name || state.user?.name || 'User',
     },
 
     actions: {
-        applyToken(token) {
+        applyToken(token, name) {
             this.token = token
             setToken(token)
             this.user = decodeToken(token)
+            if (name) {
+                this.name = name
+                setUserName(name)
+            }
             this.error = null
         },
 
@@ -38,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const response = await registerUser(payload)
                 if (response.success && response.data?.token) {
-                    this.applyToken(response.data.token)
+                    this.applyToken(response.data.token, response.data.name)
                     return response
                 }
                 throw new Error(response.message || 'Registration failed')
@@ -57,7 +64,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const response = await loginUser(credentials)
                 if (response.success && response.data?.token) {
-                    this.applyToken(response.data.token)
+                    this.applyToken(response.data.token, response.data.name)
                     return response
                 }
                 throw new Error(response.message || 'Login failed')
@@ -72,8 +79,10 @@ export const useAuthStore = defineStore('auth', {
         logout() {
             this.token = null
             this.user = null
+            this.name = null
             this.error = null
             clearToken()
+            clearUserName()
         },
     },
 })

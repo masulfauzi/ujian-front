@@ -59,8 +59,9 @@
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">No.</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nama Ujian</th>
               <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Nama Bank Soal</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Waktu Mulai</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Waktu Selesai</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Waktu Pelaksanaan</th>
+              <th class="px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase">Acak Soal</th>
+              <th class="px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase">Acak Opsi</th>
               <th class="px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase">Aksi</th>
             </tr>
           </thead>
@@ -71,8 +72,28 @@
               </td>
               <td class="px-6 py-4 text-slate-900 font-medium">{{ jadwal.nama_ujian }}</td>
               <td class="px-6 py-4 text-slate-900">{{ jadwal.nama_bank_soal }}</td>
-              <td class="px-6 py-4 text-slate-900">{{ formatDateTime(jadwal.wkt_mulai) }}</td>
-              <td class="px-6 py-4 text-slate-900">{{ formatDateTime(jadwal.wkt_selesai) }}</td>
+              <td class="px-6 py-4">
+                <p class="text-slate-800 font-medium text-sm">{{ formatTanggal(jadwal.wkt_mulai) }}</p>
+                <p class="text-slate-500 text-xs mt-0.5">{{ formatJam(jadwal.wkt_mulai) }} – {{ formatJam(jadwal.wkt_selesai) }} WIB</p>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <span :class="jadwal.acak_soal ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold">
+                  <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">
+                    {{ jadwal.acak_soal ? 'check_circle' : 'cancel' }}
+                  </span>
+                  {{ jadwal.acak_soal ? 'Ya' : 'Tidak' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <span :class="jadwal.acak_opsi ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold">
+                  <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">
+                    {{ jadwal.acak_opsi ? 'check_circle' : 'cancel' }}
+                  </span>
+                  {{ jadwal.acak_opsi ? 'Ya' : 'Tidak' }}
+                </span>
+              </td>
               <td class="px-6 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                   <button
@@ -177,14 +198,22 @@ watch(error, (newVal) => {
   }
 })
 
-const formatDateTime = (dateTime) => {
+const formatTanggal = (dateTime) => {
   if (!dateTime) return '-'
-  return new Date(dateTime).toLocaleString('id-ID', {
+  return new Date(dateTime).toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
     year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+  })
+}
+
+const formatJam = (dateTime) => {
+  if (!dateTime) return '-'
+  return new Date(dateTime).toLocaleTimeString('id-ID', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   })
 }
 

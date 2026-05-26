@@ -68,6 +68,55 @@
             </div>
           </div>
 
+          <!-- Opsi Pengacakan -->
+          <div class="bg-white rounded-lg shadow border border-slate-200 p-6">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Opsi Pengacakan</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center justify-between p-4 rounded-lg border"
+                :class="jadwalData.acak_soal ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-200'">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-xl"
+                    :class="jadwalData.acak_soal ? 'text-green-600' : 'text-slate-400'"
+                    style="font-variation-settings: 'FILL' 1;">
+                    {{ jadwalData.acak_soal ? 'shuffle' : 'format_list_numbered' }}
+                  </span>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-700">Acak Soal</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Urutan soal diacak</p>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+                  :class="jadwalData.acak_soal ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-500'">
+                  <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">
+                    {{ jadwalData.acak_soal ? 'check_circle' : 'cancel' }}
+                  </span>
+                  {{ jadwalData.acak_soal ? 'Aktif' : 'Nonaktif' }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between p-4 rounded-lg border"
+                :class="jadwalData.acak_opsi ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-200'">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-xl"
+                    :class="jadwalData.acak_opsi ? 'text-green-600' : 'text-slate-400'"
+                    style="font-variation-settings: 'FILL' 1;">
+                    {{ jadwalData.acak_opsi ? 'shuffle' : 'abc' }}
+                  </span>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-700">Acak Opsi Jawaban</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Urutan pilihan A–E diacak</p>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+                  :class="jadwalData.acak_opsi ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-500'">
+                  <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">
+                    {{ jadwalData.acak_opsi ? 'check_circle' : 'cancel' }}
+                  </span>
+                  {{ jadwalData.acak_opsi ? 'Aktif' : 'Nonaktif' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <!-- Jurusan -->
           <div class="bg-white rounded-lg shadow border border-slate-200 p-6">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Jurusan</h2>

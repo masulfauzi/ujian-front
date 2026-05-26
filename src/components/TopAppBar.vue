@@ -2,35 +2,11 @@
     <!-- TopAppBar -->
     <header
         class="fixed top-0 right-0 left-64 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm flex justify-between items-center h-16 px-8">
-        <!-- Search Bar & Title -->
-        <div class="flex items-center gap-4 flex-1">
-            <span class="text-lg font-semibold text-slate-800 font-h3 whitespace-nowrap">{{ pageTitle }}</span>
-            <div class="relative w-full max-w-md">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
-                    search
-                </span>
-                <input
-                    class="w-full pl-10 pr-4 py-2 bg-slate-50 border-transparent rounded-full text-sm focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition-all"
-                    :placeholder="isAdmin ? 'Search exams, students...' : 'Search exams, lessons, or grades...'" type="text" />
-            </div>
-        </div>
+        <!-- Title -->
+        <span class="text-lg font-semibold text-slate-800 font-h3 whitespace-nowrap">{{ pageTitle }}</span>
 
-        <!-- Right Section: Notifications & User Profile -->
+        <!-- Right Section: User Profile -->
         <div class="flex items-center gap-6">
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2">
-                <button class="p-2 text-slate-400 hover:bg-slate-50 rounded-full transition-colors relative">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
-                <button class="p-2 text-slate-400 hover:bg-slate-50 rounded-full transition-colors">
-                    <span class="material-symbols-outlined">help</span>
-                </button>
-            </div>
-
-            <!-- Divider -->
-            <div class="h-8 w-[1px] bg-slate-100"></div>
-
             <!-- User Profile with Dropdown -->
             <div class="relative">
                 <button

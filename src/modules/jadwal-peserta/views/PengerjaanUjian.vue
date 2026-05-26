@@ -1,10 +1,7 @@
 <template>
     <div class="bg-surface min-h-screen">
-        <SideBar />
-        <TopAppBar />
-
-        <main class="ml-64 pt-24 pb-12 px-8 min-h-screen">
-            <div class="max-w-5xl mx-auto">
+        <main class="py-8 px-6 min-h-screen">
+            <div class="max-w-6xl mx-auto">
 
                 <!-- Loading State -->
                 <div v-if="isLoading" class="flex justify-center items-center py-20">
@@ -42,16 +39,16 @@
                     </div>
 
                     <!-- Header dengan Timer -->
-                    <div class="bg-white rounded-3xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-sky-50 mb-8">
-                        <div class="flex items-center justify-between flex-wrap gap-4">
-                            <div>
-                                <h2 class="font-h2 text-h2 text-on-surface">{{ nilaiData?.nama_ujian || '-' }}</h2>
-                                <p class="text-slate-500 text-sm mt-1">{{ nilaiData?.nama_peserta || '-' }}</p>
+                    <div class="bg-white rounded-3xl p-4 md:p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-sky-50 mb-6">
+                        <div class="flex items-center justify-between gap-3 flex-wrap">
+                            <div class="min-w-0">
+                                <h2 class="font-h2 text-h2 text-on-surface truncate">{{ nilaiData?.nama_ujian || '-' }}</h2>
+                                <p class="text-slate-500 text-sm mt-0.5">{{ nilaiData?.nama_peserta || '-' }}</p>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <!-- Timer Card with Dynamic Styling -->
+                            <div class="flex items-center gap-2 md:gap-4 shrink-0">
+                                <!-- Timer Card -->
                                 <div
-                                    class="text-right px-6 py-4 rounded-2xl border-2 transition-all"
+                                    class="text-right px-3 py-2 md:px-6 md:py-4 rounded-2xl border-2 transition-all"
                                     :class="[
                                         timeRemaining < 60
                                             ? 'bg-red-50 border-red-300 shadow-[0_0_20px_rgba(239,68,68,0.3)]'
@@ -59,7 +56,7 @@
                                             ? 'bg-yellow-50 border-yellow-300 shadow-[0_0_15px_rgba(234,179,8,0.2)]'
                                             : 'bg-secondary-container/10 border-secondary-container/20'
                                     ]">
-                                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Waktu Tersisa</p>
+                                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5 hidden md:block">Waktu Tersisa</p>
                                     <p
                                         class="font-h3 text-h3 font-bold"
                                         :class="[
@@ -71,19 +68,27 @@
                                         ]">
                                         {{ formatTime(timeRemaining) }}
                                     </p>
-                                    <!-- Warning Badge untuk sisa 1 menit -->
-                                    <div v-if="timeRemaining < 60" class="flex items-center gap-1 mt-2 text-red-600 text-xs font-bold">
-                                        <span class="material-symbols-outlined text-[14px]">warning</span>
-                                        Waktunya menipis!
+                                    <div v-if="timeRemaining < 60" class="flex items-center gap-1 mt-1 text-red-600 text-[10px] font-bold">
+                                        <span class="material-symbols-outlined text-[12px]">warning</span>
+                                        <span class="hidden md:inline">Waktunya menipis!</span>
                                     </div>
                                 </div>
+
+                                <!-- Tombol Daftar Soal (mobile only) -->
+                                <button
+                                    @click="showSoalModal = true"
+                                    class="lg:hidden px-3 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-1.5 text-sm">
+                                    <span class="material-symbols-outlined text-[18px]">grid_view</span>
+                                    <span class="text-xs">{{ answeredCount }}/{{ totalQuestions }}</span>
+                                </button>
 
                                 <button
                                     @click="() => selesaiUjian()"
                                     :disabled="isSubmitting"
-                                    class="px-6 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
+                                    class="px-4 py-2 md:px-6 md:py-3 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 text-sm md:text-base">
                                     <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                                    {{ isSubmitting ? 'Memproses...' : 'Selesai Ujian' }}
+                                    <span class="hidden md:inline">{{ isSubmitting ? 'Memproses...' : 'Selesai Ujian' }}</span>
+                                    <span class="md:hidden">{{ isSubmitting ? '...' : 'Selesai' }}</span>
                                 </button>
                             </div>
                         </div>
@@ -215,8 +220,8 @@
                             </div>
                         </div>
 
-                        <!-- Sidebar: Daftar Soal -->
-                        <div class="lg:col-span-1">
+                        <!-- Sidebar: Daftar Soal (desktop only) -->
+                        <div class="hidden lg:block lg:col-span-1">
                             <div class="bg-white rounded-3xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-sky-50 sticky top-28">
                                 <h4 class="font-h3 text-h3 text-on-surface mb-4">Daftar Soal</h4>
                                 <div class="grid grid-cols-4 lg:grid-cols-5 gap-2 mb-6">
@@ -263,6 +268,73 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Modal Daftar Soal (mobile) -->
+                    <Teleport to="body">
+                        <Transition name="modal-fade">
+                            <div
+                                v-if="showSoalModal"
+                                class="fixed inset-0 z-[999] flex items-end justify-center bg-black/50 backdrop-blur-sm lg:hidden"
+                                @click.self="showSoalModal = false">
+                                <div class="bg-white w-full rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto">
+                                    <!-- Handle bar -->
+                                    <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-5"></div>
+
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h4 class="font-h3 text-h3 text-on-surface">Daftar Soal</h4>
+                                        <button @click="showSoalModal = false" class="p-1 text-slate-400 hover:text-slate-600">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Ringkasan -->
+                                    <div class="flex gap-3 mb-5">
+                                        <div class="flex-1 p-3 bg-secondary-container/20 rounded-2xl text-center">
+                                            <p class="text-xl font-black text-on-surface">{{ answeredCount }}</p>
+                                            <p class="text-xs text-slate-500 mt-0.5">Terjawab</p>
+                                        </div>
+                                        <div class="flex-1 p-3 bg-slate-100 rounded-2xl text-center">
+                                            <p class="text-xl font-black text-on-surface">{{ unansweredCount }}</p>
+                                            <p class="text-xs text-slate-500 mt-0.5">Belum dijawab</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Grid nomor soal -->
+                                    <div class="grid grid-cols-6 gap-2 mb-5">
+                                        <button
+                                            v-for="(q, idx) in questions"
+                                            :key="q.id"
+                                            @click="goToQuestion(idx); showSoalModal = false"
+                                            :class="[
+                                                'aspect-square rounded-xl font-bold text-sm transition-all flex items-center justify-center',
+                                                idx === currentQuestionIndex
+                                                    ? 'bg-primary text-white shadow-lg ring-2 ring-primary/30'
+                                                    : selectedAnswers[q.id]
+                                                    ? 'bg-secondary-container text-on-secondary-container'
+                                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            ]">
+                                            {{ idx + 1 }}
+                                        </button>
+                                    </div>
+
+                                    <!-- Legend -->
+                                    <div class="flex gap-4 text-xs border-t border-slate-100 pt-4">
+                                        <div class="flex items-center gap-1.5">
+                                            <div class="w-3 h-3 rounded bg-slate-100"></div>
+                                            <span class="text-slate-500">Belum dijawab</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <div class="w-3 h-3 rounded bg-secondary-container"></div>
+                                            <span class="text-slate-500">Sudah dijawab</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <div class="w-3 h-3 rounded bg-primary"></div>
+                                            <span class="text-slate-500">Aktif</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </Transition>
+                    </Teleport>
                 </template>
 
             </div>
@@ -270,11 +342,28 @@
     </div>
 </template>
 
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+    transition: opacity 0.25s ease;
+}
+.modal-fade-enter-active > div,
+.modal-fade-leave-active > div {
+    transition: transform 0.25s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+    opacity: 0;
+}
+.modal-fade-enter-from > div,
+.modal-fade-leave-to > div {
+    transform: translateY(100%);
+}
+</style>
+
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import SideBar from '@/components/SideBar.vue'
-import TopAppBar from '@/components/TopAppBar.vue'
 import { useDialog } from '@/composables/useDialog'
 import { jawabanService } from '@/services/jawabanService'
 import { nilaiService } from '@/services/nilaiService'
@@ -297,6 +386,7 @@ const timeRemaining = ref(0)
 const timerInterval = ref(null)
 const savingAnswers = ref({})
 const saveError = ref(null)
+const showSoalModal = ref(false)
 
 let jadwal = history.state?.jadwal || null
 const nilai = history.state?.nilai
@@ -509,6 +599,10 @@ onMounted(async () => {
 
     initializeTimer()
 
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {})
+    }
+
     try {
         nilaiData.value = nilai || {}
 
@@ -568,6 +662,9 @@ onMounted(async () => {
 onBeforeUnmount(() => {
     if (timerInterval.value) {
         clearInterval(timerInterval.value)
+    }
+    if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {})
     }
 })
 </script>

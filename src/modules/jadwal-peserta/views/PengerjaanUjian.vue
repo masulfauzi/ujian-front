@@ -141,6 +141,12 @@
                                         </div>
                                     </div>
                                     <div class="font-h3 text-h3 text-on-surface" v-html="currentQuestion.pertanyaan || '-'"></div>
+                                    <img
+                                        v-if="currentQuestion.gambar_soal"
+                                        :src="currentQuestion.gambar_soal"
+                                        alt="Gambar soal"
+                                        class="mt-4 max-h-64 w-auto rounded-xl border border-slate-100 object-contain"
+                                    />
                                 </div>
 
                                 <!-- Pilihan Jawaban -->
@@ -165,14 +171,19 @@
                                                 <span v-if="selectedAnswers[currentQuestion.id] === option" class="material-symbols-outlined text-[14px]">check</span>
                                             </div>
                                             <div class="flex-1">
-                                                <p class="font-bold text-slate-800 flex items-center gap-2">
-                                                    {{ option }}.
+                                                <div class="flex items-center gap-2">
+                                                    <p class="text-slate-700 text-sm">{{ currentQuestion[`opsi_${option.toLowerCase()}`] || '-' }}</p>
                                                     <span
                                                         v-if="savingAnswers[currentQuestion.id] && selectedAnswers[currentQuestion.id] === option"
                                                         class="inline-block w-3 h-3 border-2 border-slate-300 border-t-primary rounded-full animate-spin"
                                                     ></span>
-                                                </p>
-                                                <p class="text-slate-600 text-sm mt-1">{{ currentQuestion[`opsi_${option.toLowerCase()}`] || '-' }}</p>
+                                                </div>
+                                                <img
+                                                    v-if="currentQuestion[`gambar_${option.toLowerCase()}`]"
+                                                    :src="currentQuestion[`gambar_${option.toLowerCase()}`]"
+                                                    :alt="`Gambar opsi ${option}`"
+                                                    class="mt-2 max-h-40 w-auto rounded-lg border border-slate-100 object-contain"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -526,6 +537,12 @@ onMounted(async () => {
             opsi_c: item.soalDetail?.opsi_c || '',
             opsi_d: item.soalDetail?.opsi_d || '',
             opsi_e: item.soalDetail?.opsi_e || '',
+            gambar_soal: item.soalDetail?.gambar_soal || null,
+            gambar_a: item.soalDetail?.gambar_a || null,
+            gambar_b: item.soalDetail?.gambar_b || null,
+            gambar_c: item.soalDetail?.gambar_c || null,
+            gambar_d: item.soalDetail?.gambar_d || null,
+            gambar_e: item.soalDetail?.gambar_e || null,
         }))
 
         // Restore jawaban yang sudah pernah dipilih dan store jawaban record untuk update

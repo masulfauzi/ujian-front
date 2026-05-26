@@ -59,7 +59,7 @@
           <!-- Soal Text with Quill Editor -->
           <div>
             <label class="block text-sm font-semibold text-slate-900 mb-2">
-              Pertanyaan Soal <span class="text-red-600">*</span>
+              Pertanyaan Soal
             </label>
             <div
               ref="quillContainer"
@@ -104,7 +104,6 @@
               <div>
                 <label class="block text-sm font-semibold text-slate-900 mb-2">
                   Opsi {{ opsiKey.split('_')[1].toUpperCase() }}
-                  <span v-if="['opsi_a', 'opsi_b', 'opsi_c'].includes(opsiKey)" class="text-red-600">*</span>
                 </label>
                 <input
                   v-model="currentForm[opsiKey]"
@@ -257,10 +256,6 @@ const currentForm = computed({
 })
 
 const errors = reactive({
-  soal: '',
-  opsi_a: '',
-  opsi_b: '',
-  opsi_c: '',
   kunci: ''
 })
 
@@ -366,27 +361,8 @@ const initializeQuill = async () => {
 }
 
 const validateField = (field) => {
-  errors[field] = ''
-
-  if (['soal', 'opsi_a', 'opsi_b', 'opsi_c', 'kunci'].includes(field)) {
-    let value = currentForm.value[field]
-
-    if (field === 'soal' && value) {
-      const text = value.replace(/<[^>]*>/g, '').trim()
-      value = text
-    }
-
-    if (!value) {
-      const fieldNames = {
-        soal: 'Pertanyaan Soal',
-        opsi_a: 'Opsi A',
-        opsi_b: 'Opsi B',
-        opsi_c: 'Opsi C',
-        kunci: 'Kunci Jawaban'
-      }
-      errors[field] = `${fieldNames[field]} wajib diisi`
-    }
-  }
+  if (field !== 'kunci') return
+  errors.kunci = currentForm.value.kunci ? '' : 'Kunci Jawaban wajib dipilih'
 }
 
 const validateForm = () => {
@@ -394,13 +370,9 @@ const validateForm = () => {
     currentForm.value.soal = quillEditor.value.root.innerHTML
   }
 
-  validateField('soal')
-  validateField('opsi_a')
-  validateField('opsi_b')
-  validateField('opsi_c')
   validateField('kunci')
 
-  return !Object.values(errors).some(e => e !== '')
+  return !errors.kunci
 }
 
 const switchSoal = async (soalNum) => {
@@ -499,10 +471,19 @@ const handleSave = async () => {
       }
     })
 
+    let savedId = currentForm.value.id
     if (currentForm.value.id) {
       await soalService.updateSoal(currentForm.value.id, formData)
     } else {
-      await soalService.createSoal(formData)
+      const res = await soalService.createSoal(formData)
+      savedId = res.data?.data?.id || res.data?.id
+    }
+
+    // Tandai soal sebagai sudah tersimpan agar nomor langsung biru
+    soalList[currentSoalNumber.value] = {
+      ...soalList[currentSoalNumber.value],
+      id: savedId,
+      no_soal: currentSoalNumber.value,
     }
 
     saveStatus.value = {
@@ -559,10 +540,19 @@ const handleSaveAndNext = async () => {
       }
     })
 
+    let savedId = currentForm.value.id
     if (currentForm.value.id) {
       await soalService.updateSoal(currentForm.value.id, formData)
     } else {
-      await soalService.createSoal(formData)
+      const res = await soalService.createSoal(formData)
+      savedId = res.data?.data?.id || res.data?.id
+    }
+
+    // Tandai soal sebagai sudah tersimpan agar nomor langsung biru
+    soalList[currentSoalNumber.value] = {
+      ...soalList[currentSoalNumber.value],
+      id: savedId,
+      no_soal: currentSoalNumber.value,
     }
 
     saveStatus.value = {

@@ -23,25 +23,6 @@
       <router-view />
     </div>
     <AppDialog />
-    <footer
-      class="bg-slate-50 border-t border-slate-200 w-full py-8 mt-auto text-sm font-['Plus_Jakarta_Sans'] text-slate-500">
-      <div class="flex flex-col md:flex-row justify-between items-center px-8 space-y-4 md:space-y-0 max-w-7xl mx-auto">
-        <div class="font-bold text-slate-900">
-          SkyView Systems
-        </div>
-        <div class="flex space-x-6">
-          <a class="text-slate-500 hover:text-sky-500 hover:underline transition-all cursor-pointer" href="#">Privacy
-            Policy</a>
-          <a class="text-slate-500 hover:text-sky-500 hover:underline transition-all cursor-pointer" href="#">Terms of
-            Service</a>
-          <a class="text-slate-500 hover:text-sky-500 hover:underline transition-all cursor-pointer" href="#">Contact
-            Support</a>
-        </div>
-        <div class="text-slate-500">
-          © 2024 SkyView Systems. All rights reserved.
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 

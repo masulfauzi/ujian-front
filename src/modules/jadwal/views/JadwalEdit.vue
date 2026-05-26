@@ -167,6 +167,38 @@
           <p v-if="errors.selectedKelasIds" class="text-red-600 text-sm mt-1">{{ errors.selectedKelasIds }}</p>
         </div>
 
+        <!-- Opsi Pengacakan -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-900 mb-3">Opsi Pengacakan</label>
+          <div class="space-y-3 border border-slate-300 rounded-lg p-4">
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <div class="relative mt-0.5 shrink-0">
+                <input type="checkbox" v-model="formData.acak_soal" class="sr-only peer" />
+                <div class="w-5 h-5 rounded border-2 border-slate-300 peer-checked:border-sky-500 peer-checked:bg-sky-500 transition-all flex items-center justify-center">
+                  <span v-if="formData.acak_soal" class="material-symbols-outlined text-white text-[14px]" style="font-variation-settings: 'FILL' 1;">check</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-slate-800 group-hover:text-sky-600 transition-colors">Acak Soal</p>
+                <p class="text-xs text-slate-500 mt-0.5">Urutan soal diacak untuk setiap peserta</p>
+              </div>
+            </label>
+            <div class="border-t border-slate-100"></div>
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <div class="relative mt-0.5 shrink-0">
+                <input type="checkbox" v-model="formData.acak_opsi" class="sr-only peer" />
+                <div class="w-5 h-5 rounded border-2 border-slate-300 peer-checked:border-sky-500 peer-checked:bg-sky-500 transition-all flex items-center justify-center">
+                  <span v-if="formData.acak_opsi" class="material-symbols-outlined text-white text-[14px]" style="font-variation-settings: 'FILL' 1;">check</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-slate-800 group-hover:text-sky-600 transition-colors">Acak Opsi Jawaban</p>
+                <p class="text-xs text-slate-500 mt-0.5">Urutan pilihan jawaban (A–E) diacak untuk setiap peserta</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex gap-3 pt-4">
           <button
@@ -225,6 +257,8 @@ const formData = reactive({
   angkatan: '',
   id_jurusan: [],
   selectedKelasIds: [],
+  acak_soal: false,
+  acak_opsi: false,
 })
 
 const errors = reactive({
@@ -266,6 +300,8 @@ onMounted(async () => {
     formData.wkt_selesai = jadwalData.wkt_selesai ? toDatetimeLocal(jadwalData.wkt_selesai) : ''
     formData.durasi = jadwalData.durasi || ''
     formData.angkatan = jadwalData.tingkat || ''
+    formData.acak_soal = !!jadwalData.acak_soal
+    formData.acak_opsi = !!jadwalData.acak_opsi
 
     // Extract id_jurusan dari response - gunakan key id_jurusan
     if (jadwalData.id_jurusan && Array.isArray(jadwalData.id_jurusan)) {
@@ -461,6 +497,8 @@ const handleSubmit = async () => {
       durasi: formData.durasi,
       tingkat: formData.angkatan,
       id_kelas: formData.selectedKelasIds,
+      acak_soal: formData.acak_soal ? 1 : 0,
+      acak_opsi: formData.acak_opsi ? 1 : 0,
     }
 
     console.log('Sending payload:', jadwalPayload)

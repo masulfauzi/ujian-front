@@ -216,6 +216,7 @@ import TopAppBar from '@/components/TopAppBar.vue'
 import { useBankSoalStore } from '@/stores/bankSoal'
 import { useMapelStore } from '@/stores/mapel'
 import { useRouter } from 'vue-router'
+import { useDialog } from '@/composables/useDialog'
 
 const bankSoalStore = useBankSoalStore()
 const mapelStore = useMapelStore()

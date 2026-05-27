@@ -98,7 +98,7 @@
                 <!-- Pertanyaan -->
                 <div class="mb-3">
                   <div class="text-slate-900 font-medium prose prose-sm max-w-none" v-html="soal.soal"></div>
-                  <img v-if="isImageAvailable(soal.gambar_soal)" :src="getProxiedImageUrl(soal.gambar_soal, 'soal')" :alt="`Gambar soal ${index + 1}`" class="mt-2 w-auto h-auto min-h-[100px] max-h-96 rounded-lg border border-slate-200">
+                  <img v-if="isImageAvailable(soal.gambar_soal)" :src="soal.gambar_soal" :alt="`Gambar soal ${index + 1}`" class="mt-2 w-auto h-auto min-h-[100px] max-h-96 rounded-lg border border-slate-200">
                 </div>
 
                 <!-- Opsi Jawaban Section -->
@@ -112,7 +112,7 @@
                       </div>
                       <div class="flex-1">
                         <p class="text-slate-700">{{ soal.opsi_a }}</p>
-                        <img v-if="isImageAvailable(soal.gambar_a)" :src="getProxiedImageUrl(soal.gambar_a, 'opsi')" :alt="'Opsi A'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
+                        <img v-if="isImageAvailable(soal.gambar_a)" :src="soal.gambar_a" :alt="'Opsi A'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'A'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
                     </div>
@@ -124,7 +124,7 @@
                       </div>
                       <div class="flex-1">
                         <p class="text-slate-700">{{ soal.opsi_b }}</p>
-                        <img v-if="isImageAvailable(soal.gambar_b)" :src="getProxiedImageUrl(soal.gambar_b, 'opsi')" :alt="'Opsi B'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
+                        <img v-if="isImageAvailable(soal.gambar_b)" :src="soal.gambar_b" :alt="'Opsi B'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'B'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
                     </div>
@@ -136,7 +136,7 @@
                       </div>
                       <div class="flex-1">
                         <p class="text-slate-700">{{ soal.opsi_c }}</p>
-                        <img v-if="isImageAvailable(soal.gambar_c)" :src="getProxiedImageUrl(soal.gambar_c, 'opsi')" :alt="'Opsi C'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
+                        <img v-if="isImageAvailable(soal.gambar_c)" :src="soal.gambar_c" :alt="'Opsi C'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'C'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
                     </div>
@@ -148,7 +148,7 @@
                       </div>
                       <div class="flex-1">
                         <p class="text-slate-700">{{ soal.opsi_d }}</p>
-                        <img v-if="isImageAvailable(soal.gambar_d)" :src="getProxiedImageUrl(soal.gambar_d, 'opsi')" :alt="'Opsi D'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
+                        <img v-if="isImageAvailable(soal.gambar_d)" :src="soal.gambar_d" :alt="'Opsi D'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'D'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
                     </div>
@@ -160,7 +160,7 @@
                       </div>
                       <div class="flex-1">
                         <p class="text-slate-700">{{ soal.opsi_e }}</p>
-                        <img v-if="isImageAvailable(soal.gambar_e)" :src="getProxiedImageUrl(soal.gambar_e, 'opsi')" :alt="'Opsi E'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
+                        <img v-if="isImageAvailable(soal.gambar_e)" :src="soal.gambar_e" :alt="'Opsi E'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'E'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
                     </div>
@@ -398,13 +398,6 @@ const getOpsiLabel = (index) => {
 
 const isImageAvailable = (imagePath) => {
   return imagePath && typeof imagePath === 'string' && imagePath.trim().length > 0
-}
-
-const getProxiedImageUrl = (imagePath, type = 'soal') => {
-  if (!isImageAvailable(imagePath)) return ''
-  // Extract filename from full URL
-  const filename = imagePath.split('/').pop()
-  return `/api/images/${type}/${filename}`
 }
 
 const handleAddSoal = () => {

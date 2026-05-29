@@ -7,8 +7,8 @@
     <TopAppBar />
 
     <!-- Main Content -->
-    <main class="ml-64 min-h-screen">
-      <div class="pt-24 pb-12 px-8 max-w-2xl mx-auto">
+    <main class="lg:ml-64 min-h-screen">
+      <div class="pt-24 pb-12 px-4 lg:px-8 max-w-2xl mx-auto">
       <!-- Page Title -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-slate-900">Buat Jurusan Baru</h1>

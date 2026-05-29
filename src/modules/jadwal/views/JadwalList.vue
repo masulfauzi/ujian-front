@@ -7,8 +7,8 @@
     <TopAppBar />
 
     <!-- Main Content -->
-    <main class="ml-64 min-h-screen">
-      <div class="pt-24 pb-12 px-8 max-w-7xl mx-auto">
+    <main class="lg:ml-64 min-h-screen">
+      <div class="pt-24 pb-12 px-4 lg:px-8 max-w-7xl mx-auto">
       <!-- Page Title & Create Button -->
       <div class="flex items-center justify-between mb-8">
         <div>

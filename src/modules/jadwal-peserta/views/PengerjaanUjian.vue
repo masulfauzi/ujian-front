@@ -82,13 +82,13 @@
                                     <span class="text-xs">{{ answeredCount }}/{{ totalQuestions }}</span>
                                 </button>
 
+                                <!-- Tombol Selesai Ujian (desktop only) -->
                                 <button
                                     @click="() => selesaiUjian()"
                                     :disabled="isSubmitting"
-                                    class="px-4 py-2 md:px-6 md:py-3 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 text-sm md:text-base">
+                                    class="hidden md:flex px-4 py-2 md:px-6 md:py-3 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed items-center gap-2 text-sm md:text-base">
                                     <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                                    <span class="hidden md:inline">{{ isSubmitting ? 'Memproses...' : 'Selesai Ujian' }}</span>
-                                    <span class="md:hidden">{{ isSubmitting ? '...' : 'Selesai' }}</span>
+                                    {{ isSubmitting ? 'Memproses...' : 'Selesai Ujian' }}
                                 </button>
                             </div>
                         </div>
@@ -196,19 +196,42 @@
 
                                 <!-- Navigation Buttons -->
                                 <div class="flex gap-3 pt-6 border-t border-slate-200">
+                                    <!-- Tombol Sebelumnya -->
                                     <button
                                         @click="previousQuestion"
                                         :disabled="currentQuestionIndex === 0"
-                                        class="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                        class="px-3 md:px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                                         <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-                                        Sebelumnya
+                                        <span class="hidden md:inline">Sebelumnya</span>
+                                        <span class="md:hidden text-xs">Back</span>
                                     </button>
+
+                                    <!-- Desktop: Tombol Selanjutnya -->
                                     <button
                                         @click="nextQuestion"
                                         :disabled="currentQuestionIndex === totalQuestions - 1"
-                                        class="ml-auto px-6 py-3 bg-primary-container hover:bg-primary text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                        class="hidden md:flex ml-auto px-6 py-3 bg-primary-container hover:bg-primary text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed items-center gap-2">
                                         Selanjutnya
                                         <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                                    </button>
+
+                                    <!-- Mobile: Tombol Selanjutnya (soal bukan terakhir) -->
+                                    <button
+                                        v-if="currentQuestionIndex < totalQuestions - 1"
+                                        @click="nextQuestion"
+                                        class="md:hidden ml-auto px-3 py-3 bg-primary-container hover:bg-primary text-white font-bold rounded-xl transition-colors flex items-center gap-2">
+                                        <span class="text-xs">Next</span>
+                                        <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                                    </button>
+
+                                    <!-- Mobile: Tombol Selesai Ujian (soal terakhir) -->
+                                    <button
+                                        v-if="currentQuestionIndex === totalQuestions - 1"
+                                        @click="() => selesaiUjian()"
+                                        :disabled="isSubmitting"
+                                        class="md:hidden ml-auto px-3 py-3 bg-secondary hover:bg-secondary/90 text-white font-bold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                        <span class="text-xs">{{ isSubmitting ? 'Proses' : 'Selesai' }}</span>
                                     </button>
                                 </div>
                             </div>

@@ -3,8 +3,8 @@
         <SideBar />
         <TopAppBar />
 
-        <main class="ml-64 mt-16 min-h-screen">
-            <div class="pt-8 pb-12 px-8 max-w-5xl mx-auto">
+        <main class="lg:ml-64 mt-16 min-h-screen">
+            <div class="pt-8 pb-12 px-4 lg:px-8 max-w-5xl mx-auto">
 
                 <!-- Welcome Section -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
@@ -37,7 +37,7 @@
                         class="bg-white rounded-3xl p-12 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-slate-50 flex flex-col items-center text-center">
                         <span class="material-symbols-outlined text-[64px] text-slate-300 mb-4">event_busy</span>
                         <h3 class="font-h3 text-h3 text-slate-500 mb-2">Belum ada ujian hari ini</h3>
-                        <p class="text-slate-400 text-sm max-w-sm">Tidak ada ujian yang dijadwalkan untuk hari ini. Silakan periksa kembali besok.</p>
+                        <p class="text-slate-400 text-sm">Tidak ada ujian yang dijadwalkan untuk hari ini. Silakan periksa kembali besok.</p>
                     </div>
 
                     <!-- Exam List Grid -->

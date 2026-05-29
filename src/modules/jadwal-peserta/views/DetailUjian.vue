@@ -3,7 +3,7 @@
         <SideBar />
         <TopAppBar />
 
-        <main class="ml-64 pt-24 pb-12 px-8 min-h-screen">
+        <main class="lg:ml-64 pt-24 pb-12 px-8 min-h-screen">
             <div class="max-w-5xl mx-auto">
 
                 <!-- Loading State -->

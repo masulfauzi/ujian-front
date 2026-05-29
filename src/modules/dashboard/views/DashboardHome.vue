@@ -7,8 +7,8 @@
         <TopAppBar />
 
         <!-- Main Content -->
-        <main class="ml-64 min-h-screen">
-            <div class="pt-24 pb-12 px-8 max-w-7xl mx-auto">
+        <main class="lg:ml-64 min-h-screen">
+            <div class="pt-20 lg:pt-24 pb-12 px-4 lg:px-8 max-w-7xl mx-auto">
                 <!-- Welcome Header -->
                 <div class="mb-10">
                     <h1 class="font-h1 text-h1 text-on-surface mb-2">Selamat datang, {{ displayName }}!</h1>

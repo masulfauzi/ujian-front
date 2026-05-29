@@ -7,9 +7,9 @@
         <TopAppBar />
 
         <!-- Main Content -->
-        <main class="ml-64 min-h-screen">
+        <main class="lg:ml-64 min-h-screen">
             <!-- Content Area -->
-            <div class="pt-24 pb-12 px-8 max-w-7xl mx-auto">
+            <div class="pt-20 lg:pt-24 pb-12 px-4 lg:px-8 max-w-7xl mx-auto">
                 <!-- Welcome Section -->
                 <section class="mb-10 flex items-center justify-between">
                     <div>

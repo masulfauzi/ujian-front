@@ -1,7 +1,14 @@
 <template>
     <!-- TopAppBar -->
     <header
-        class="fixed top-0 right-0 left-64 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm flex justify-between items-center h-16 px-8">
+        class="fixed top-0 right-0 left-0 lg:left-64 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm flex justify-between items-center h-16 px-4 lg:px-8">
+        <!-- Mobile Menu Toggle (mobile only) -->
+        <button
+            @click="uiStore.toggleSidebar()"
+            class="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+            <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+
         <!-- Title -->
         <span class="text-lg font-semibold text-slate-800 font-h3 whitespace-nowrap">{{ pageTitle }}</span>
 
@@ -66,9 +73,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useUiStore } from '@/stores/ui'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const router = useRouter()
 const isDropdownOpen = ref(false)
 

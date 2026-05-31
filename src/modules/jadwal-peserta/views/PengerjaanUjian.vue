@@ -622,8 +622,9 @@ onMounted(async () => {
 
     initializeTimer()
 
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {})
+    const el = document.documentElement
+    if (!document.fullscreenElement && typeof el.requestFullscreen === 'function') {
+        el.requestFullscreen().catch(() => {})
     }
 
     try {
@@ -686,7 +687,7 @@ onBeforeUnmount(() => {
     if (timerInterval.value) {
         clearInterval(timerInterval.value)
     }
-    if (document.fullscreenElement) {
+    if (document.fullscreenElement && typeof document.exitFullscreen === 'function') {
         document.exitFullscreen().catch(() => {})
     }
 })

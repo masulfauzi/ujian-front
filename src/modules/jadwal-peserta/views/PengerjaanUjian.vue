@@ -145,7 +145,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="font-h3 text-h3 text-on-surface" v-html="currentQuestion.pertanyaan || '-'"></div>
+                                    <div class="font-h3 text-h3 text-on-surface prose prose-sm max-w-none" v-html="currentQuestion.pertanyaan || '-'"></div>
                                     <img
                                         v-if="currentQuestion.gambar_soal"
                                         :src="currentQuestion.gambar_soal"

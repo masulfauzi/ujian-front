@@ -21,6 +21,7 @@ const routes = [
     ...jadwalRoutes,
     ...jadwalPesertaRoutes,
     ...authRoutes,
+    { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
 ]
 
 const router = createRouter({

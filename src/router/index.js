@@ -8,6 +8,7 @@ import { kelasRoutes } from '../modules/kelas/routes'
 import { pesertaRoutes } from '../modules/peserta/routes'
 import { jadwalRoutes } from '../modules/jadwal/routes'
 import { jadwalPesertaRoutes } from '../modules/jadwal-peserta/routes'
+import { nilaiRoutes } from '../modules/nilai/routes'
 import { setupAuthGuards } from './guards'
 
 const routes = [
@@ -20,6 +21,7 @@ const routes = [
     ...pesertaRoutes,
     ...jadwalRoutes,
     ...jadwalPesertaRoutes,
+    ...nilaiRoutes,
     ...authRoutes,
     { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
 ]

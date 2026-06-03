@@ -63,7 +63,7 @@
                         <p v-if="errors.password" class="text-red-600 font-label-sm mt-1">{{ errors.password }}</p>
                     </div>
                     <!-- Options -->
-                    <div class="flex items-center justify-between py-1">
+                    <div class="flex items-center py-1">
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
                                 <input v-model="form.rememberMe" class="sr-only peer" type="checkbox" />
@@ -76,7 +76,6 @@
                             </div>
                             <span class="ml-2 font-label-md text-on-surface-variant">Remember me</span>
                         </label>
-                        <a class="font-label-md text-primary-container hover:underline" href="#">Forgot password?</a>
                     </div>
                     <!-- Login Button (Mint Green) -->
                     <button
@@ -92,11 +91,6 @@
                             Logging in...
                         </span>
                     </button>
-                    <!-- Create Account -->
-                    <p class="text-center font-body-md text-on-surface-variant mt-md">
-                        Don't have an account?
-                        <router-link to="/register" class="text-secondary font-semibold hover:underline">Create Account</router-link>
-                    </p>
                 </form>
                 <!-- Decorative corner elements -->
                 <div class="absolute -top-12 -right-12 w-24 h-24 bg-secondary-container/10 rounded-full blur-2xl"></div>

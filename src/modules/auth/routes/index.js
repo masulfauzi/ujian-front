@@ -1,5 +1,5 @@
 import LoginView from '../views/Login.vue'
-import RegisterView from '../views/Register.vue'
+// import RegisterView from '../views/Register.vue'
 
 export const authRoutes = [
     {
@@ -7,9 +7,9 @@ export const authRoutes = [
         name: 'auth.login',
         component: LoginView,
     },
-    {
-        path: '/register',
-        name: 'auth.register',
-        component: RegisterView,
-    },
+    // {
+    //     path: '/register',
+    //     name: 'auth.register',
+    //     component: RegisterView,
+    // },
 ]

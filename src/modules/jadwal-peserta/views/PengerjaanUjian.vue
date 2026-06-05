@@ -1,5 +1,20 @@
 <template>
     <div class="bg-surface min-h-screen">
+        <!-- User Info & Logout (Top Right) -->
+        <div class="fixed top-6 right-6 z-40 flex items-center gap-4 bg-white rounded-2xl px-6 py-3 shadow-lg border border-slate-100">
+            <div class="text-right">
+                <p class="text-sm font-semibold text-slate-800">{{ authStore.displayName }}</p>
+                <p class="text-xs text-slate-500">Peserta Ujian</p>
+            </div>
+            <button
+                @click="handleLogout"
+                :disabled="isLoggingOut"
+                class="px-4 py-2 bg-red-50 text-red-600 font-semibold rounded-lg hover:bg-red-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 text-sm">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span class="hidden md:inline">{{ isLoggingOut ? 'Keluar...' : 'Keluar' }}</span>
+            </button>
+        </div>
+
         <main class="py-8 px-6 min-h-screen">
             <div class="max-w-6xl mx-auto">
 
@@ -388,6 +403,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDialog } from '@/composables/useDialog'
+import { useAuthStore } from '@/stores/auth'
 import { jawabanService } from '@/services/jawabanService'
 import { nilaiService } from '@/services/nilaiService'
 import { soalService } from '@/services/soalService'
@@ -396,6 +412,7 @@ import { jadwalService } from '@/services/jadwalService'
 const route = useRoute()
 const router = useRouter()
 const { $alert, $confirm } = useDialog()
+const authStore = useAuthStore()
 
 const nilaiData = ref(null)
 const questions = ref([])
@@ -410,6 +427,7 @@ const timerInterval = ref(null)
 const savingAnswers = ref({})
 const saveError = ref(null)
 const showSoalModal = ref(false)
+const isLoggingOut = ref(false)
 
 let jadwal = history.state?.jadwal || null
 const nilai = history.state?.nilai
@@ -536,6 +554,30 @@ function goToQuestion(index) {
 
 function toLocalString(date) {
     return new Date(date).toLocaleString('sv-SE').replace('T', ' ')
+}
+
+async function handleLogout() {
+    if (isLoggingOut.value) return
+
+    const ok = await $confirm('Anda akan keluar dari sesi ujian. Apakah Anda yakin?', {
+        title: 'Konfirmasi Keluar',
+    })
+    if (!ok) return
+
+    isLoggingOut.value = true
+    try {
+        if (timerInterval.value) clearInterval(timerInterval.value)
+        if (document.fullscreenElement && typeof document.exitFullscreen === 'function') {
+            document.exitFullscreen().catch(() => {})
+        }
+
+        authStore.logout()
+        router.push({ name: 'login' })
+    } catch (err) {
+        console.error('Error during logout:', err)
+    } finally {
+        isLoggingOut.value = false
+    }
 }
 
 async function selesaiUjian(force = false) {

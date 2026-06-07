@@ -192,7 +192,7 @@
                                             </div>
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-2">
-                                                    <p class="text-slate-700 text-sm">{{ currentQuestion[`opsi_${option.toLowerCase()}`] || '-' }}</p>
+                                                    <div class="text-slate-700 text-sm prose prose-sm max-w-none" v-html="currentQuestion[`opsi_${option.toLowerCase()}`] || '-'"></div>
                                                     <span
                                                         v-if="savingAnswers[currentQuestion.id] && selectedAnswers[currentQuestion.id] === option"
                                                         class="inline-block w-3 h-3 border-2 border-slate-300 border-t-primary rounded-full animate-spin"

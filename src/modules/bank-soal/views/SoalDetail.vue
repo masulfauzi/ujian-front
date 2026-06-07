@@ -111,7 +111,7 @@
                         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">A</span>
                       </div>
                       <div class="flex-1">
-                        <p class="text-slate-700">{{ soal.opsi_a }}</p>
+                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_a"></div>
                         <img v-if="isImageAvailable(soal.gambar_a)" :src="soal.gambar_a" :alt="'Opsi A'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'A'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
@@ -123,7 +123,7 @@
                         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">B</span>
                       </div>
                       <div class="flex-1">
-                        <p class="text-slate-700">{{ soal.opsi_b }}</p>
+                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_b"></div>
                         <img v-if="isImageAvailable(soal.gambar_b)" :src="soal.gambar_b" :alt="'Opsi B'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'B'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
@@ -135,7 +135,7 @@
                         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">C</span>
                       </div>
                       <div class="flex-1">
-                        <p class="text-slate-700">{{ soal.opsi_c }}</p>
+                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_c"></div>
                         <img v-if="isImageAvailable(soal.gambar_c)" :src="soal.gambar_c" :alt="'Opsi C'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'C'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
@@ -147,7 +147,7 @@
                         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">D</span>
                       </div>
                       <div class="flex-1">
-                        <p class="text-slate-700">{{ soal.opsi_d }}</p>
+                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_d"></div>
                         <img v-if="isImageAvailable(soal.gambar_d)" :src="soal.gambar_d" :alt="'Opsi D'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'D'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
@@ -159,7 +159,7 @@
                         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">E</span>
                       </div>
                       <div class="flex-1">
-                        <p class="text-slate-700">{{ soal.opsi_e }}</p>
+                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_e"></div>
                         <img v-if="isImageAvailable(soal.gambar_e)" :src="soal.gambar_e" :alt="'Opsi E'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
                       </div>
                       <span v-if="soal.kunci === 'E'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
@@ -398,6 +398,13 @@ const getOpsiLabel = (index) => {
 
 const isImageAvailable = (imagePath) => {
   return imagePath && typeof imagePath === 'string' && imagePath.trim().length > 0
+}
+
+const decodeHtmlEntities = (html) => {
+  if (!html) return ''
+  const textarea = document.createElement('textarea')
+  textarea.innerHTML = html
+  return textarea.value
 }
 
 const handleAddSoal = () => {

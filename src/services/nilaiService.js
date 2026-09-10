@@ -1,9 +1,11 @@
 import api from './api'
 
 export const nilaiService = {
-  mulaiUjian: async (idJadwal) => {
+  // token wajib diisi hanya jika jadwal.wajib_token aktif
+  mulaiUjian: async (idJadwal, token = null) => {
     try {
-      const response = await api.post(`/nilai/mulai-ujian/${idJadwal}`)
+      const payload = token ? { token } : {}
+      const response = await api.post(`/nilai/mulai-ujian/${idJadwal}`, payload)
       return response
     } catch (error) {
       throw error

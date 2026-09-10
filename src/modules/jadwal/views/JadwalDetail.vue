@@ -70,8 +70,8 @@
 
           <!-- Opsi Pengacakan -->
           <div class="bg-white rounded-lg shadow border border-slate-200 p-6">
-            <h2 class="text-lg font-semibold text-slate-900 mb-4">Opsi Pengacakan</h2>
-            <div class="grid grid-cols-2 gap-4">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Opsi Pengacakan &amp; Keamanan</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div class="flex items-center justify-between p-4 rounded-lg border"
                 :class="jadwalData.acak_soal ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-200'">
                 <div class="flex items-center gap-3">
@@ -112,6 +112,27 @@
                     {{ jadwalData.acak_opsi ? 'check_circle' : 'cancel' }}
                   </span>
                   {{ jadwalData.acak_opsi ? 'Aktif' : 'Nonaktif' }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between p-4 rounded-lg border"
+                :class="jadwalData.wajib_token ? 'bg-green-50 border-green-200' : 'bg-slate-50 border-slate-200'">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-xl"
+                    :class="jadwalData.wajib_token ? 'text-green-600' : 'text-slate-400'"
+                    style="font-variation-settings: 'FILL' 1;">
+                    vpn_key
+                  </span>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-700">Wajib Token</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Token dari pengawas diperlukan</p>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+                  :class="jadwalData.wajib_token ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-500'">
+                  <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">
+                    {{ jadwalData.wajib_token ? 'check_circle' : 'cancel' }}
+                  </span>
+                  {{ jadwalData.wajib_token ? 'Aktif' : 'Nonaktif' }}
                 </span>
               </div>
             </div>

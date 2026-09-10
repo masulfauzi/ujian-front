@@ -126,6 +126,15 @@
                         </div>
                     </div>
 
+                    <!-- Wajib Token Notice -->
+                    <div v-if="Number(detail?.wajib_token)" class="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+                        <span class="material-symbols-outlined text-amber-500 shrink-0">vpn_key</span>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-amber-800">Ujian Ini Memerlukan Token</p>
+                            <p class="text-sm text-amber-700 mt-1">Tanyakan kode token ujian yang berlaku ke pengawas sebelum menekan tombol "Mulai Ujian Sekarang".</p>
+                        </div>
+                    </div>
+
                     <!-- Error Notification -->
                     <div v-if="startError" class="mt-8 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
                         <span class="material-symbols-outlined text-red-500 shrink-0">error</span>
@@ -177,7 +186,7 @@ import { nilaiService } from '@/services/nilaiService'
 
 const route = useRoute()
 const router = useRouter()
-const { $alert } = useDialog()
+const { $alert, $prompt } = useDialog()
 
 const jadwal = history.state?.jadwal || null
 const detail = ref(null)
@@ -207,11 +216,22 @@ function formatDateTime(dt) {
 
 async function mulaiSekarang() {
     if (isStarting.value) return
-    isStarting.value = true
     startError.value = null
 
+    let token = null
+    if (Number(detail.value?.wajib_token)) {
+        token = await $prompt('Ujian ini mewajibkan token. Masukkan kode token yang diumumkan oleh pengawas.', {
+            title: 'Masukkan Token Ujian',
+            inputLabel: 'Token Ujian',
+            inputPlaceholder: 'Contoh: A1B2C3',
+        })
+        if (token === null) return // dibatalkan
+    }
+
+    isStarting.value = true
+
     try {
-        const response = await nilaiService.mulaiUjian(route.params.id)
+        const response = await nilaiService.mulaiUjian(route.params.id, token)
         const nilaiData = response.data?.data
         // detail.value adalah Vue Proxy — harus di-convert ke plain object dulu
         // sebelum dikirim via history.state (structured clone tidak bisa handle Proxy)

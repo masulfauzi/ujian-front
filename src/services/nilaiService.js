@@ -39,4 +39,24 @@ export const nilaiService = {
       throw error
     }
   },
+
+  // Maju ke section berikutnya (hanya berhasil jika durasi_menit_minimal section aktif sudah terlampaui)
+  nextSection: async (idNilai) => {
+    try {
+      const response = await api.post(`/nilai/${idNilai}/next-section`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  // Cek status section aktif (read-only, untuk polling countdown)
+  getSectionStatus: async (idNilai) => {
+    try {
+      const response = await api.get(`/nilai/${idNilai}/section-status`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
 }

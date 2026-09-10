@@ -35,4 +35,15 @@ export const jawabanService = {
       throw error
     }
   },
+
+  // GET soal + jawaban dalam satu section tertentu pada sesi ujian ini
+  // (403 jika section diminta melebihi frontier/section aktif sesi ini)
+  getSoalByNilaiIdAndSection: async (idNilai, idSection) => {
+    try {
+      const response = await api.get(`/jawaban/nilai/${idNilai}/section/${idSection}`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
 }

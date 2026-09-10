@@ -102,6 +102,15 @@
                     <span class="material-symbols-outlined text-lg">edit</span>
                   </button>
                   <button
+                    @click="handleDownloadKartu(kelas.id)"
+                    :disabled="downloadingKartuId === kelas.id"
+                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Download Kartu Ujian">
+                    <span class="material-symbols-outlined text-lg" :class="{ 'animate-spin': downloadingKartuId === kelas.id }">
+                      {{ downloadingKartuId === kelas.id ? 'progress_activity' : 'badge' }}
+                    </span>
+                  </button>
+                  <button
                     @click="handleDelete(kelas.id)"
                     class="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                     title="Hapus">
@@ -161,12 +170,15 @@ import TopAppBar from '@/components/TopAppBar.vue'
 import { useKelasStore } from '@/stores/kelas'
 import { useRouter } from 'vue-router'
 import { useDialog } from '@/composables/useDialog'
+import { pesertaService } from '@/services/pesertaService'
+import { downloadBlob, extractBlobErrorMessage } from '@/utils/download'
 
 const kelasStore = useKelasStore()
 const router = useRouter()
-const { $confirm } = useDialog()
+const { $confirm, $alert } = useDialog()
 const currentPage = ref(1)
 const filterTingkat = ref('')
+const downloadingKartuId = ref(null)
 
 onMounted(async () => {
   await kelasStore.fetchKelasList(1)
@@ -225,5 +237,19 @@ const handlePageChange = async (page) => {
 const handleFilter = async () => {
   currentPage.value = 1
   await kelasStore.fetchKelasList(1, pageSize.value, { tingkat: filterTingkat.value })
+}
+
+const handleDownloadKartu = async (id) => {
+  if (downloadingKartuId.value) return
+  downloadingKartuId.value = id
+  try {
+    const response = await pesertaService.downloadKartuUjian(id)
+    downloadBlob(response, 'kartu_ujian.pdf', 'application/pdf')
+  } catch (err) {
+    const message = await extractBlobErrorMessage(err, 'Gagal mengunduh kartu ujian')
+    await $alert(message, { title: 'Gagal', type: 'error' })
+  } finally {
+    downloadingKartuId.value = null
+  }
 }
 </script>

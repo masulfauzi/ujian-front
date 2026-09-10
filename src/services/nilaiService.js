@@ -42,6 +42,18 @@ export const nilaiService = {
     }
   },
 
+  // Export analisis jawaban per soal ke Excel (per kelas, dalam ZIP)
+  getAnalisisJawaban: async (idJadwal) => {
+    try {
+      const response = await api.get(`/nilai/analisis/${idJadwal}`, {
+        responseType: 'blob',
+      })
+      return response
+    } catch (error) {
+      throw error
+    }
+  },
+
   // Maju ke section berikutnya (hanya berhasil jika durasi_menit_minimal section aktif sudah terlampaui)
   nextSection: async (idNilai) => {
     try {

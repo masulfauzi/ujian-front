@@ -47,22 +47,29 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex gap-3">
+          <div class="flex flex-wrap gap-3">
             <button
               @click="handleAddSoal"
-              class="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+              class="flex-1 min-w-[45%] sm:min-w-0 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
               <span class="material-symbols-outlined">add</span>
               Tambah Soal
             </button>
             <button
               @click="triggerFileInput"
-              class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+              class="flex-1 min-w-[45%] sm:min-w-0 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
               <span class="material-symbols-outlined">upload_file</span>
               Import dari Excel
             </button>
             <button
+              @click="handleDownloadTemplate"
+              :disabled="isDownloadingTemplate"
+              class="flex-1 min-w-[45%] sm:min-w-0 border border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined">download</span>
+              {{ isDownloadingTemplate ? 'Mengunduh...' : 'Download Template' }}
+            </button>
+            <button
               @click="handleBack"
-              class="flex-1 border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-3 px-6 rounded-lg transition-colors">
+              class="flex-1 min-w-[45%] sm:min-w-0 border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-3 px-6 rounded-lg transition-colors">
               Kembali
             </button>
           </div>
@@ -253,6 +260,7 @@ import { useDialog } from '@/composables/useDialog'
 import { useMapelStore } from '@/stores/mapel'
 import { useSoalStore } from '@/stores/soal'
 import { soalService } from '@/services/soalService'
+import { downloadBlob, extractBlobErrorMessage } from '@/utils/download'
 
 const route = useRoute()
 const router = useRouter()
@@ -265,6 +273,7 @@ const soalId = route.params.id
 const error = ref(null)
 const fileInput = ref(null)
 const isImporting = ref(false)
+const isDownloadingTemplate = ref(false)
 
 const isLoading = computed(() => bankSoalStore.isLoading)
 const selectedSoal = computed(() => bankSoalStore.selectedSoal)
@@ -337,6 +346,25 @@ const handleSoalPageChange = async (page) => {
 
 const triggerFileInput = () => {
   fileInput.value?.click()
+}
+
+const handleDownloadTemplate = async () => {
+  if (isDownloadingTemplate.value) return
+  isDownloadingTemplate.value = true
+  error.value = null
+
+  try {
+    const response = await soalService.downloadTemplate()
+    downloadBlob(
+      response,
+      'template_import_soal.xlsx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+  } catch (err) {
+    error.value = await extractBlobErrorMessage(err, 'Gagal mengunduh template')
+  } finally {
+    isDownloadingTemplate.value = false
+  }
 }
 
 const handleFileImport = async (event) => {

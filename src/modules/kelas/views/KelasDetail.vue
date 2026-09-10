@@ -70,22 +70,29 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-3">
           <button
             @click="handleEdit"
-            class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+            class="flex-1 min-w-[45%] sm:min-w-0 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">edit</span>
             Edit Kelas
           </button>
           <button
+            @click="handleDownloadKartu"
+            :disabled="isDownloadingKartu"
+            class="flex-1 min-w-[45%] sm:min-w-0 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">badge</span>
+            {{ isDownloadingKartu ? 'Mengunduh...' : 'Download Kartu Ujian' }}
+          </button>
+          <button
             @click="handleDelete"
-            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+            class="flex-1 min-w-[45%] sm:min-w-0 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">delete</span>
             Hapus Kelas
           </button>
           <button
             @click="handleBack"
-            class="flex-1 border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-3 px-6 rounded-lg transition-colors">
+            class="flex-1 min-w-[45%] sm:min-w-0 border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-3 px-6 rounded-lg transition-colors">
             Kembali
           </button>
         </div>
@@ -113,15 +120,18 @@ import TopAppBar from '@/components/TopAppBar.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useKelasStore } from '@/stores/kelas'
 import { useDialog } from '@/composables/useDialog'
+import { pesertaService } from '@/services/pesertaService'
+import { downloadBlob, extractBlobErrorMessage } from '@/utils/download'
 
 const route = useRoute()
 const router = useRouter()
 const kelasStore = useKelasStore()
-const { $confirm } = useDialog()
+const { $confirm, $alert } = useDialog()
 const kelasId = route.params.id
 
 const isLoading = computed(() => kelasStore.isLoading)
 const error = ref(null)
+const isDownloadingKartu = ref(false)
 const selectedKelas = computed(() => kelasStore.selectedKelas)
 
 onMounted(async () => {
@@ -149,6 +159,20 @@ const handleDelete = async () => {
 
 const handleBack = () => {
   router.push({ name: 'kelas.list' })
+}
+
+const handleDownloadKartu = async () => {
+  if (isDownloadingKartu.value) return
+  isDownloadingKartu.value = true
+  try {
+    const response = await pesertaService.downloadKartuUjian(kelasId)
+    downloadBlob(response, 'kartu_ujian.pdf', 'application/pdf')
+  } catch (err) {
+    const message = await extractBlobErrorMessage(err, 'Gagal mengunduh kartu ujian')
+    await $alert(message, { title: 'Gagal', type: 'error' })
+  } finally {
+    isDownloadingKartu.value = false
+  }
 }
 
 const formatDate = (dateString) => {

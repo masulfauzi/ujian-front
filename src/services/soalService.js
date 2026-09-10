@@ -71,4 +71,16 @@ export const soalService = {
       throw error
     }
   },
+
+  // Download template Excel kosong (header saja) untuk import soal
+  downloadTemplate: async () => {
+    try {
+      const response = await api.get('/soal/template', {
+        responseType: 'blob',
+      })
+      return response
+    } catch (error) {
+      throw error
+    }
+  },
 }

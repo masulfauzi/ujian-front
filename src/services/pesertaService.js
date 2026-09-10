@@ -56,4 +56,16 @@ export const pesertaService = {
       throw error
     }
   },
+
+  // Download kartu ujian (PDF, siap cetak & gunting) untuk semua peserta satu kelas
+  downloadKartuUjian: async (idKelas) => {
+    try {
+      const response = await api.get(`/peserta/kartu-ujian/${idKelas}`, {
+        responseType: 'blob',
+      })
+      return response
+    } catch (error) {
+      throw error
+    }
+  },
 }

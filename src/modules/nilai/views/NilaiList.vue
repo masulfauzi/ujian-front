@@ -50,7 +50,7 @@
         <!-- Export Button & Data Section -->
         <div v-else-if="selectedJadwalId">
           <!-- Export Button -->
-          <div class="mb-6 flex gap-3">
+          <div class="mb-6 flex flex-wrap gap-3">
             <button
               v-if="nilaiList.length > 0"
               @click="handleExport"
@@ -58,6 +58,14 @@
               class="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors">
               <span class="material-symbols-outlined">download</span>
               {{ isExporting ? 'Mengunduh...' : 'Export Nilai' }}
+            </button>
+            <button
+              v-if="nilaiList.length > 0"
+              @click="handleAnalisis"
+              :disabled="isAnalyzing"
+              class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+              <span class="material-symbols-outlined">analytics</span>
+              {{ isAnalyzing ? 'Mengunduh...' : 'Analisis Jawaban' }}
             </button>
           </div>
 
@@ -154,6 +162,7 @@ import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { jadwalService } from '@/services/jadwalService'
 import { nilaiService } from '@/services/nilaiService'
+import { downloadBlob, extractBlobErrorMessage } from '@/utils/download'
 
 const jadwalList = ref([])
 const selectedJadwalId = ref('')
@@ -164,6 +173,7 @@ const pageSize = ref(10)
 const isLoadingJadwal = ref(false)
 const isLoadingNilai = ref(false)
 const isExporting = ref(false)
+const isAnalyzing = ref(false)
 const errorMsg = ref('')
 
 const totalPages = computed(() => Math.ceil(totalNilai.value / pageSize.value))
@@ -216,20 +226,27 @@ const handleExport = async () => {
   isExporting.value = true
   try {
     const response = await nilaiService.exportNilai(selectedJadwalId.value)
-    const blob = new Blob([response.data], { type: 'application/zip' })
-    const url = URL.createObjectURL(blob)
-    const filename =
-      response.headers['content-disposition']?.match(/filename="(.+)"/)?.[1] || 'export_nilai.zip'
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
+    downloadBlob(response, 'export_nilai.zip', 'application/zip')
   } catch (err) {
-    errorMsg.value = err.response?.data?.message || 'Gagal mengekspor nilai'
+    errorMsg.value = await extractBlobErrorMessage(err, 'Gagal mengekspor nilai')
     console.error('Error exporting nilai:', err)
   } finally {
     isExporting.value = false
+  }
+}
+
+const handleAnalisis = async () => {
+  if (!selectedJadwalId.value) return
+  isAnalyzing.value = true
+  errorMsg.value = ''
+  try {
+    const response = await nilaiService.getAnalisisJawaban(selectedJadwalId.value)
+    downloadBlob(response, 'analisis_jawaban.zip', 'application/zip')
+  } catch (err) {
+    errorMsg.value = await extractBlobErrorMessage(err, 'Gagal mengunduh analisis jawaban')
+    console.error('Error downloading analisis jawaban:', err)
+  } finally {
+    isAnalyzing.value = false
   }
 }
 

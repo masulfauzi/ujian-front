@@ -2,6 +2,7 @@ import JadwalList from '../views/JadwalList.vue'
 import JadwalCreate from '../views/JadwalCreate.vue'
 import JadwalDetail from '../views/JadwalDetail.vue'
 import JadwalEdit from '../views/JadwalEdit.vue'
+import JadwalSection from '../views/JadwalSection.vue'
 
 export const jadwalRoutes = [
   {
@@ -26,6 +27,12 @@ export const jadwalRoutes = [
     path: '/admin/jadwal/:id/edit',
     name: 'jadwal.edit',
     component: JadwalEdit,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/jadwal/:id/section',
+    name: 'jadwal.section',
+    component: JadwalSection,
     meta: { requiresAuth: true, requiresAdmin: true },
   },
 ]

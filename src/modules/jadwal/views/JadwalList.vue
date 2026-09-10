@@ -109,6 +109,12 @@
                     <span class="material-symbols-outlined text-lg">edit</span>
                   </button>
                   <button
+                    @click="handleSection(jadwal.id)"
+                    class="p-2 text-primary hover:bg-primary/10 rounded transition-colors"
+                    title="Kelola Section">
+                    <span class="material-symbols-outlined text-lg">splitscreen</span>
+                  </button>
+                  <button
                     @click="handleDelete(jadwal.id)"
                     class="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                     title="Hapus">
@@ -227,6 +233,10 @@ const handleDetail = (id) => {
 
 const handleEdit = (id) => {
   router.push({ name: 'jadwal.edit', params: { id } })
+}
+
+const handleSection = (id) => {
+  router.push({ name: 'jadwal.section', params: { id } })
 }
 
 const handleDelete = async (id) => {

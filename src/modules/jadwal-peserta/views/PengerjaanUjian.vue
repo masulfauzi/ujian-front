@@ -94,7 +94,7 @@
                                     @click="showSoalModal = true"
                                     class="lg:hidden px-3 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-1.5 text-sm">
                                     <span class="material-symbols-outlined text-[18px]">grid_view</span>
-                                    <span class="text-xs">{{ answeredCount }}/{{ totalQuestions }}</span>
+                                    <span class="text-xs">{{ globalAnsweredCount }}/{{ globalTotalQuestions }}</span>
                                 </button>
 
                                 <!-- Tombol Selesai Ujian (desktop only) -->
@@ -116,6 +116,17 @@
                             <!-- Soal Card -->
                             <div v-if="currentQuestion" class="bg-white rounded-3xl p-8 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-sky-50">
                                 <div class="mb-6">
+                                    <!-- Section Badge -->
+                                    <div v-if="usesSections && viewingSection" class="flex items-center gap-2 mb-4 flex-wrap">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                                            <span class="material-symbols-outlined text-[14px]">bookmark</span>
+                                            Section {{ viewingSection.urutan }}/{{ sections.length }}: {{ viewingSection.nama_section }}
+                                        </span>
+                                        <span v-if="!isViewingFrontier" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-wide">
+                                            Meninjau ulang
+                                        </span>
+                                    </div>
+
                                     <!-- Progress Bar Section -->
                                     <div class="mb-5">
                                         <div class="flex items-center justify-between mb-2">
@@ -209,6 +220,12 @@
                                     </div>
                                 </div>
 
+                                <!-- Section Advance Error -->
+                                <div v-if="sectionAdvanceError" class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    {{ sectionAdvanceError }}
+                                </div>
+
                                 <!-- Navigation Buttons -->
                                 <div class="flex gap-3 pt-6 border-t border-slate-200">
                                     <!-- Tombol Sebelumnya -->
@@ -221,8 +238,25 @@
                                         <span class="md:hidden text-xs">Back</span>
                                     </button>
 
+                                    <!-- Desktop: Tombol Lanjut ke Section Berikutnya -->
+                                    <button
+                                        v-if="showNextSectionButton"
+                                        @click="handleNextSectionClick"
+                                        :disabled="isAdvancingSection || (isViewingFrontier && sectionCountdown > 0)"
+                                        class="hidden md:flex ml-auto px-6 py-3 bg-primary-container hover:bg-primary text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed items-center gap-2">
+                                        <template v-if="isViewingFrontier && sectionCountdown > 0">
+                                            <span class="material-symbols-outlined text-[18px]">lock_clock</span>
+                                            Tunggu {{ formatCountdown(sectionCountdown) }}
+                                        </template>
+                                        <template v-else>
+                                            {{ isAdvancingSection ? 'Memproses...' : 'Lanjut ke Section Berikutnya' }}
+                                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                                        </template>
+                                    </button>
+
                                     <!-- Desktop: Tombol Selanjutnya -->
                                     <button
+                                        v-else
                                         @click="nextQuestion"
                                         :disabled="currentQuestionIndex === totalQuestions - 1"
                                         class="hidden md:flex ml-auto px-6 py-3 bg-primary-container hover:bg-primary text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed items-center gap-2">
@@ -230,7 +264,7 @@
                                         <span class="material-symbols-outlined text-[18px]">chevron_right</span>
                                     </button>
 
-                                    <!-- Mobile: Tombol Selanjutnya (soal bukan terakhir) -->
+                                    <!-- Mobile: Tombol Selanjutnya (soal bukan terakhir dalam section) -->
                                     <button
                                         v-if="currentQuestionIndex < totalQuestions - 1"
                                         @click="nextQuestion"
@@ -239,9 +273,24 @@
                                         <span class="material-symbols-outlined text-[18px]">chevron_right</span>
                                     </button>
 
-                                    <!-- Mobile: Tombol Selesai Ujian (soal terakhir) -->
+                                    <!-- Mobile: Tombol Lanjut ke Section Berikutnya -->
                                     <button
-                                        v-if="currentQuestionIndex === totalQuestions - 1"
+                                        v-else-if="showNextSectionButton"
+                                        @click="handleNextSectionClick"
+                                        :disabled="isAdvancingSection || (isViewingFrontier && sectionCountdown > 0)"
+                                        class="md:hidden ml-auto px-3 py-3 bg-primary-container hover:bg-primary text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                        <template v-if="isViewingFrontier && sectionCountdown > 0">
+                                            <span class="text-xs">{{ formatCountdown(sectionCountdown) }}</span>
+                                        </template>
+                                        <template v-else>
+                                            <span class="text-xs">{{ isAdvancingSection ? 'Proses' : 'Lanjut' }}</span>
+                                        </template>
+                                        <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                                    </button>
+
+                                    <!-- Mobile: Tombol Selesai Ujian (soal terakhir, section terakhir) -->
+                                    <button
+                                        v-else
                                         @click="() => selesaiUjian()"
                                         :disabled="isSubmitting"
                                         class="md:hidden ml-auto px-3 py-3 bg-secondary hover:bg-secondary/90 text-white font-bold rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
@@ -262,9 +311,44 @@
                         <div class="hidden lg:block lg:col-span-1">
                             <div class="bg-white rounded-3xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-sky-50 sticky top-28">
                                 <h4 class="font-h3 text-h3 text-on-surface mb-4">Daftar Soal</h4>
-                                <div class="grid grid-cols-4 lg:grid-cols-5 gap-2 mb-6">
+
+                                <!-- Grouped by Section -->
+                                <template v-if="usesSections">
+                                    <div v-for="(sec, sIdx) in sections" :key="sec.id" class="mb-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest truncate">
+                                                {{ sec.urutan }}. {{ sec.nama_section }}
+                                            </p>
+                                            <span v-if="sec.urutan > frontierUrutan" class="flex items-center gap-1 text-[10px] text-slate-400 font-bold shrink-0">
+                                                <span class="material-symbols-outlined text-[13px]">lock</span>
+                                            </span>
+                                        </div>
+                                        <div v-if="sec.urutan <= frontierUrutan" class="grid grid-cols-5 gap-2">
+                                            <button
+                                                v-for="(q, qIdx) in (sectionQuestionsMap[sec.id] || [])"
+                                                :key="q.id"
+                                                @click="viewSectionQuestion(sIdx, qIdx)"
+                                                :class="[
+                                                    'aspect-square rounded-lg font-bold text-sm transition-all flex items-center justify-center',
+                                                    sIdx === viewingSectionIndex && qIdx === currentQuestionIndex
+                                                        ? 'bg-primary text-white shadow-lg'
+                                                        : selectedAnswers[q.id]
+                                                        ? 'bg-secondary-container text-on-secondary-container'
+                                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                ]">
+                                                {{ q.no_soal ?? (qIdx + 1) }}
+                                            </button>
+                                        </div>
+                                        <p v-else class="text-xs text-slate-400 italic px-1">
+                                            {{ sec.jml_soal }} soal &mdash; selesaikan section saat ini untuk membuka
+                                        </p>
+                                    </div>
+                                </template>
+
+                                <!-- Flat list (tanpa section) -->
+                                <div v-else class="grid grid-cols-4 lg:grid-cols-5 gap-2 mb-6">
                                     <button
-                                        v-for="(q, idx) in questions"
+                                        v-for="(q, idx) in displayedQuestions"
                                         :key="q.id"
                                         @click="goToQuestion(idx)"
                                         :class="[
@@ -293,14 +377,18 @@
                                         <div class="w-3 h-3 rounded bg-primary"></div>
                                         <span class="text-slate-600">Soal aktif</span>
                                     </div>
+                                    <div v-if="usesSections" class="flex items-center gap-2 text-xs">
+                                        <span class="material-symbols-outlined text-[14px] text-slate-400">lock</span>
+                                        <span class="text-slate-600">Section terkunci</span>
+                                    </div>
                                 </div>
 
                                 <!-- Summary -->
                                 <div class="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
                                     <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Ringkasan</p>
                                     <div class="space-y-1 text-sm">
-                                        <p class="text-slate-600"><span class="font-bold">{{ answeredCount }}</span>/{{ totalQuestions }} terjawab</p>
-                                        <p class="text-slate-600"><span class="font-bold">{{ unansweredCount }}</span> belum dijawab</p>
+                                        <p class="text-slate-600"><span class="font-bold">{{ globalAnsweredCount }}</span>/{{ globalTotalQuestions }} terjawab</p>
+                                        <p class="text-slate-600"><span class="font-bold">{{ globalUnansweredCount }}</span> belum dijawab</p>
                                     </div>
                                 </div>
                             </div>
@@ -327,19 +415,52 @@
                                     <!-- Ringkasan -->
                                     <div class="flex gap-3 mb-5">
                                         <div class="flex-1 p-3 bg-secondary-container/20 rounded-2xl text-center">
-                                            <p class="text-xl font-black text-on-surface">{{ answeredCount }}</p>
+                                            <p class="text-xl font-black text-on-surface">{{ globalAnsweredCount }}</p>
                                             <p class="text-xs text-slate-500 mt-0.5">Terjawab</p>
                                         </div>
                                         <div class="flex-1 p-3 bg-slate-100 rounded-2xl text-center">
-                                            <p class="text-xl font-black text-on-surface">{{ unansweredCount }}</p>
+                                            <p class="text-xl font-black text-on-surface">{{ globalUnansweredCount }}</p>
                                             <p class="text-xs text-slate-500 mt-0.5">Belum dijawab</p>
                                         </div>
                                     </div>
 
-                                    <!-- Grid nomor soal -->
-                                    <div class="grid grid-cols-6 gap-2 mb-5">
+                                    <!-- Grouped by Section -->
+                                    <template v-if="usesSections">
+                                        <div v-for="(sec, sIdx) in sections" :key="sec.id" class="mb-4">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest truncate">
+                                                    {{ sec.urutan }}. {{ sec.nama_section }}
+                                                </p>
+                                                <span v-if="sec.urutan > frontierUrutan" class="flex items-center gap-1 text-[10px] text-slate-400 font-bold shrink-0">
+                                                    <span class="material-symbols-outlined text-[13px]">lock</span>
+                                                </span>
+                                            </div>
+                                            <div v-if="sec.urutan <= frontierUrutan" class="grid grid-cols-6 gap-2 mb-1">
+                                                <button
+                                                    v-for="(q, qIdx) in (sectionQuestionsMap[sec.id] || [])"
+                                                    :key="q.id"
+                                                    @click="viewSectionQuestion(sIdx, qIdx); showSoalModal = false"
+                                                    :class="[
+                                                        'aspect-square rounded-xl font-bold text-sm transition-all flex items-center justify-center',
+                                                        sIdx === viewingSectionIndex && qIdx === currentQuestionIndex
+                                                            ? 'bg-primary text-white shadow-lg ring-2 ring-primary/30'
+                                                            : selectedAnswers[q.id]
+                                                            ? 'bg-secondary-container text-on-secondary-container'
+                                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                    ]">
+                                                    {{ q.no_soal ?? (qIdx + 1) }}
+                                                </button>
+                                            </div>
+                                            <p v-else class="text-xs text-slate-400 italic px-1">
+                                                {{ sec.jml_soal }} soal &mdash; terkunci
+                                            </p>
+                                        </div>
+                                    </template>
+
+                                    <!-- Grid nomor soal (tanpa section) -->
+                                    <div v-else class="grid grid-cols-6 gap-2 mb-5">
                                         <button
-                                            v-for="(q, idx) in questions"
+                                            v-for="(q, idx) in displayedQuestions"
                                             :key="q.id"
                                             @click="goToQuestion(idx); showSoalModal = false"
                                             :class="[
@@ -408,6 +529,7 @@ import { jawabanService } from '@/services/jawabanService'
 import { nilaiService } from '@/services/nilaiService'
 import { soalService } from '@/services/soalService'
 import { jadwalService } from '@/services/jadwalService'
+import { sectionService } from '@/services/sectionService'
 
 const route = useRoute()
 const router = useRouter()
@@ -415,7 +537,7 @@ const { $alert, $confirm } = useDialog()
 const authStore = useAuthStore()
 
 const nilaiData = ref(null)
-const questions = ref([])
+const questions = ref([]) // dipakai saat ujian TIDAK memakai section
 const selectedAnswers = ref({})
 const jawabanRecords = ref({}) // Map: id_soal -> jawaban record (dengan id, untuk update)
 const currentQuestionIndex = ref(0)
@@ -429,6 +551,16 @@ const saveError = ref(null)
 const showSoalModal = ref(false)
 const isLoggingOut = ref(false)
 
+// --- State khusus fitur Section ---
+const sections = ref([]) // daftar SectionResponse jadwal ini, urut berdasarkan urutan
+const sectionStatus = ref(null) // SectionProgressResponse dari section aktif (frontier) peserta
+const viewingSectionIndex = ref(0) // index section yang sedang ditampilkan (bisa <= frontier)
+const sectionQuestionsMap = ref({}) // Map: id_section -> array soal (sudah ditransform)
+const sectionAdvanceError = ref(null)
+const isAdvancingSection = ref(false)
+const sectionCountdown = ref(0)
+const sectionCountdownInterval = ref(null)
+
 let jadwal = history.state?.jadwal || null
 const nilai = history.state?.nilai
 
@@ -440,10 +572,39 @@ if (!nilai?.id) {
   })
 }
 
-const currentQuestion = computed(() => questions.value[currentQuestionIndex.value] || null)
-const totalQuestions = computed(() => questions.value.length)
-const answeredCount = computed(() => Object.keys(selectedAnswers.value).length)
+const usesSections = computed(() => sections.value.length > 0)
+const viewingSection = computed(() => sections.value[viewingSectionIndex.value] || null)
+const frontierUrutan = computed(() => sectionStatus.value?.urutan ?? sections.value[0]?.urutan ?? 1)
+const isViewingFrontier = computed(() => usesSections.value && viewingSection.value?.id === sectionStatus.value?.id_section)
+const isLastSectionInView = computed(() => !usesSections.value || (viewingSection.value && viewingSection.value.urutan >= sections.value.length))
+
+// Set soal yang sedang ditampilkan: soal section aktif (jika pakai section) atau seluruh soal
+const displayedQuestions = computed(() => {
+    if (!usesSections.value) return questions.value
+    return sectionQuestionsMap.value[viewingSection.value?.id] || []
+})
+
+const currentQuestion = computed(() => displayedQuestions.value[currentQuestionIndex.value] || null)
+const totalQuestions = computed(() => displayedQuestions.value.length)
+const answeredCount = computed(() => displayedQuestions.value.filter(q => selectedAnswers.value[q.id]).length)
 const unansweredCount = computed(() => totalQuestions.value - answeredCount.value)
+
+// Ringkasan global (seluruh section, dipakai di sidebar & modal)
+const globalTotalQuestions = computed(() => {
+    if (!usesSections.value) return totalQuestions.value
+    return sections.value.reduce((sum, s) => sum + (s.jml_soal || 0), 0)
+})
+const globalAnsweredCount = computed(() => {
+    if (!usesSections.value) return answeredCount.value
+    return Object.keys(selectedAnswers.value).length
+})
+const globalUnansweredCount = computed(() => globalTotalQuestions.value - globalAnsweredCount.value)
+
+const showNextSectionButton = computed(() =>
+    usesSections.value &&
+    currentQuestionIndex.value === totalQuestions.value - 1 &&
+    !isLastSectionInView.value
+)
 
 function formatTime(seconds) {
     // Handle negative atau 0
@@ -456,6 +617,13 @@ function formatTime(seconds) {
     const secs = seconds % 60
 
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+}
+
+function formatCountdown(seconds) {
+    if (seconds <= 0) return '00:00'
+    const minutes = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
 }
 
 async function selectAnswer(option) {
@@ -552,6 +720,142 @@ function goToQuestion(index) {
     currentQuestionIndex.value = index
 }
 
+// Ubah tampilan ke section+soal tertentu. Hanya berhasil jika section itu sudah terbuka (urutan <= frontier).
+async function viewSectionQuestion(sectionIndex, questionIndex) {
+    const sec = sections.value[sectionIndex]
+    if (!sec || sec.urutan > frontierUrutan.value) return
+
+    if (!sectionQuestionsMap.value[sec.id]) {
+        try {
+            await fetchSectionQuestions(sec)
+        } catch (err) {
+            saveError.value = err.response?.data?.message || err.message || 'Gagal memuat soal section'
+            return
+        }
+    }
+
+    viewingSectionIndex.value = sectionIndex
+    currentQuestionIndex.value = questionIndex
+}
+
+// Tombol "Lanjut ke Section Berikutnya": jika sedang meninjau section lama, cukup pindah tampilan
+// (section berikutnya sudah pasti terbuka). Jika sedang di section aktif (frontier), harus lewat API
+// agar backend yang memvalidasi durasi_menit_minimal.
+async function handleNextSectionClick() {
+    if (!isViewingFrontier.value) {
+        await viewSectionQuestion(viewingSectionIndex.value + 1, 0)
+        return
+    }
+    await advanceSection()
+}
+
+async function enrichAndTransformQuestions(data) {
+    // Fetch detail soal (opsi & gambar lengkap) secara parallel
+    const soalDetailPromises = data.map(item =>
+        soalService.getSoalById(item.id_soal)
+            .then(res => ({ ...item, soalDetail: res.data }))
+            .catch(() => item)
+    )
+    const dataWithDetails = await Promise.all(soalDetailPromises)
+
+    return dataWithDetails.map(item => ({
+        id: item.id_soal,
+        no_soal: item.no_soal,
+        no_urut: item.no_urut,
+        pertanyaan: item.soalDetail?.soal || item.soal,
+        opsi_a: item.soalDetail?.opsi_a || item.opsi_a || '',
+        opsi_b: item.soalDetail?.opsi_b || item.opsi_b || '',
+        opsi_c: item.soalDetail?.opsi_c || item.opsi_c || '',
+        opsi_d: item.soalDetail?.opsi_d || item.opsi_d || '',
+        opsi_e: item.soalDetail?.opsi_e || item.opsi_e || '',
+        gambar_soal: item.soalDetail?.gambar_soal || null,
+        gambar_a: item.soalDetail?.gambar_a || item.gambar_a || null,
+        gambar_b: item.soalDetail?.gambar_b || item.gambar_b || null,
+        gambar_c: item.soalDetail?.gambar_c || item.gambar_c || null,
+        gambar_d: item.soalDetail?.gambar_d || item.gambar_d || null,
+        gambar_e: item.soalDetail?.gambar_e || item.gambar_e || null,
+    }))
+}
+
+function mergeAnswerRecords(data) {
+    data.forEach(item => {
+        if (item.jawaban) {
+            selectedAnswers.value[item.id_soal] = item.jawaban
+        }
+        jawabanRecords.value[item.id_soal] = {
+            id: item.id,
+            id_nilai: item.id_nilai,
+            id_soal: item.id_soal,
+            id_peserta: item.id_peserta,
+            no_urut: item.no_urut,
+        }
+    })
+}
+
+async function fetchSectionQuestions(section) {
+    if (sectionQuestionsMap.value[section.id]) {
+        return sectionQuestionsMap.value[section.id]
+    }
+    const response = await jawabanService.getSoalByNilaiIdAndSection(nilai.id, section.id)
+    const data = response.data || []
+    const transformed = await enrichAndTransformQuestions(data)
+    mergeAnswerRecords(data)
+    sectionQuestionsMap.value = { ...sectionQuestionsMap.value, [section.id]: transformed }
+    return transformed
+}
+
+function restartSectionCountdown() {
+    if (sectionCountdownInterval.value) {
+        clearInterval(sectionCountdownInterval.value)
+        sectionCountdownInterval.value = null
+    }
+    if (!sectionStatus.value || sectionStatus.value.boleh_lanjut || sectionStatus.value.is_section_terakhir) {
+        sectionCountdown.value = 0
+        return
+    }
+
+    const endTimeMs = Date.now() + Math.max(0, sectionStatus.value.sisa_detik || 0) * 1000
+    const calcRemaining = () => Math.max(0, Math.floor((endTimeMs - Date.now()) / 1000))
+
+    sectionCountdown.value = calcRemaining()
+    sectionCountdownInterval.value = setInterval(() => {
+        sectionCountdown.value = calcRemaining()
+        if (sectionCountdown.value <= 0) {
+            clearInterval(sectionCountdownInterval.value)
+            sectionCountdownInterval.value = null
+        }
+    }, 1000)
+}
+
+async function advanceSection() {
+    if (isAdvancingSection.value) return
+    isAdvancingSection.value = true
+    sectionAdvanceError.value = null
+
+    try {
+        const response = await nilaiService.nextSection(nilai.id)
+        const data = response.data
+        sectionStatus.value = data
+
+        if (data.boleh_lanjut) {
+            const newIndex = sections.value.findIndex(s => s.id === data.id_section)
+            if (newIndex !== -1) {
+                await fetchSectionQuestions(sections.value[newIndex])
+                viewingSectionIndex.value = newIndex
+                currentQuestionIndex.value = 0
+            }
+            restartSectionCountdown()
+        } else {
+            sectionAdvanceError.value = `Belum bisa lanjut ke section berikutnya. Tunggu ${formatCountdown(data.sisa_detik)} lagi.`
+            restartSectionCountdown()
+        }
+    } catch (err) {
+        sectionAdvanceError.value = err.response?.data?.message || err.message || 'Gagal lanjut ke section berikutnya'
+    } finally {
+        isAdvancingSection.value = false
+    }
+}
+
 function toLocalString(date) {
     return new Date(date).toLocaleString('sv-SE').replace('T', ' ')
 }
@@ -567,6 +871,7 @@ async function handleLogout() {
     isLoggingOut.value = true
     try {
         if (timerInterval.value) clearInterval(timerInterval.value)
+        if (sectionCountdownInterval.value) clearInterval(sectionCountdownInterval.value)
         if (document.fullscreenElement && typeof document.exitFullscreen === 'function') {
             document.exitFullscreen().catch(() => {})
         }
@@ -584,8 +889,8 @@ async function selesaiUjian(force = false) {
     if (isSubmitting.value) return
 
     if (!force) {
-        const msg = unansweredCount.value > 0
-            ? `Masih ada ${unansweredCount.value} soal yang belum dijawab. Yakin ingin menyelesaikan ujian?`
+        const msg = globalUnansweredCount.value > 0
+            ? `Masih ada ${globalUnansweredCount.value} soal yang belum dijawab. Yakin ingin menyelesaikan ujian?`
             : 'Yakin ingin menyelesaikan ujian?'
         const ok = await $confirm(msg, {
             title: 'Selesaikan Ujian',
@@ -604,6 +909,7 @@ async function selesaiUjian(force = false) {
         })
 
         if (timerInterval.value) clearInterval(timerInterval.value)
+        if (sectionCountdownInterval.value) clearInterval(sectionCountdownInterval.value)
 
         await $alert('Ujian Anda telah selesai! Terima kasih.', { title: 'Ujian Selesai', type: 'success' })
         router.push({ name: 'dashboard.home' })
@@ -672,52 +978,35 @@ onMounted(async () => {
     try {
         nilaiData.value = nilai || {}
 
-        // Panggil endpoint untuk ambil soal + jawaban yang sudah dipilih
-        const response = await jawabanService.getSoalByNilaiId(nilai.id)
-        const data = response.data || []
+        // Cek apakah jadwal ini memakai pembagian section
+        let sectionsData = []
+        try {
+            const sectionsRes = await sectionService.getSectionsByJadwal(route.params.id)
+            sectionsData = sectionsRes.data || []
+        } catch (e) {
+            console.warn('Gagal memuat data section, lanjut tanpa section:', e)
+        }
+        sections.value = sectionsData.slice().sort((a, b) => a.urutan - b.urutan)
 
-        // Fetch soal details (untuk mendapatkan opsi A-E) secara parallel
-        const soalDetailPromises = data.map(item =>
-            soalService.getSoalById(item.id_soal)
-                .then(res => ({
-                    ...item,
-                    soalDetail: res.data
-                }))
-                .catch(() => item)
-        )
-        const dataWithDetails = await Promise.all(soalDetailPromises)
+        if (sections.value.length > 0) {
+            // Mode section: ambil status section aktif (frontier), lalu preload semua section yang sudah terbuka
+            const statusRes = await nilaiService.getSectionStatus(nilai.id)
+            sectionStatus.value = statusRes.data
 
-        // Transform ke format yang dipakai di template
-        questions.value = dataWithDetails.map(item => ({
-            id: item.id_soal,
-            no_soal: item.no_soal,
-            pertanyaan: item.soalDetail?.soal || item.soal,
-            opsi_a: item.soalDetail?.opsi_a || '',
-            opsi_b: item.soalDetail?.opsi_b || '',
-            opsi_c: item.soalDetail?.opsi_c || '',
-            opsi_d: item.soalDetail?.opsi_d || '',
-            opsi_e: item.soalDetail?.opsi_e || '',
-            gambar_soal: item.soalDetail?.gambar_soal || null,
-            gambar_a: item.soalDetail?.gambar_a || null,
-            gambar_b: item.soalDetail?.gambar_b || null,
-            gambar_c: item.soalDetail?.gambar_c || null,
-            gambar_d: item.soalDetail?.gambar_d || null,
-            gambar_e: item.soalDetail?.gambar_e || null,
-        }))
+            const frontierIndex = Math.max(0, sections.value.findIndex(s => s.id === sectionStatus.value.id_section))
+            const sectionsToPreload = sections.value.slice(0, frontierIndex + 1)
+            await Promise.all(sectionsToPreload.map(sec => fetchSectionQuestions(sec).catch(() => {})))
 
-        // Restore jawaban yang sudah pernah dipilih dan store jawaban record untuk update
-        data.forEach(item => {
-            if (item.jawaban) {
-                selectedAnswers.value[item.id_soal] = item.jawaban
-            }
-            jawabanRecords.value[item.id_soal] = {
-                id: item.id,
-                id_nilai: item.id_nilai,
-                id_soal: item.id_soal,
-                id_peserta: item.id_peserta,
-                no_urut: item.no_urut,
-            }
-        })
+            viewingSectionIndex.value = frontierIndex
+            currentQuestionIndex.value = 0
+            restartSectionCountdown()
+        } else {
+            // Mode biasa (tanpa section): ambil seluruh soal ujian sekaligus
+            const response = await jawabanService.getSoalByNilaiId(nilai.id)
+            const data = response.data || []
+            questions.value = await enrichAndTransformQuestions(data)
+            mergeAnswerRecords(data)
+        }
     } catch (err) {
         error.value = err.response?.data?.message || err.message || 'Gagal memuat soal ujian'
     } finally {
@@ -728,6 +1017,9 @@ onMounted(async () => {
 onBeforeUnmount(() => {
     if (timerInterval.value) {
         clearInterval(timerInterval.value)
+    }
+    if (sectionCountdownInterval.value) {
+        clearInterval(sectionCountdownInterval.value)
     }
     if (document.fullscreenElement && typeof document.exitFullscreen === 'function') {
         document.exitFullscreen().catch(() => {})

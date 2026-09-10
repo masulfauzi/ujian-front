@@ -151,6 +151,12 @@
               Edit Jadwal
             </button>
             <button
+              @click="handleSection"
+              class="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined">splitscreen</span>
+              Kelola Section
+            </button>
+            <button
               @click="handleBack"
               class="flex-1 border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-3 px-6 rounded-lg transition-colors">
               Kembali
@@ -212,6 +218,10 @@ const formatDateTime = (dateTime) => {
 
 const handleEdit = () => {
   router.push({ name: 'jadwal.edit', params: { id: jadwalId } })
+}
+
+const handleSection = () => {
+  router.push({ name: 'jadwal.section', params: { id: jadwalId } })
 }
 
 const handleBack = () => {

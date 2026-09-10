@@ -2,10 +2,13 @@ import { reactive } from 'vue'
 
 const state = reactive({
     visible: false,
-    type: 'info',       // 'info' | 'success' | 'error' | 'warning' | 'confirm'
+    type: 'info',       // 'info' | 'success' | 'error' | 'warning' | 'confirm' | 'prompt'
     title: '',
     message: '',
     checkboxLabel: '',
+    inputLabel: '',
+    inputPlaceholder: '',
+    inputValue: '',
     resolve: null,
 })
 
@@ -21,6 +24,22 @@ function $confirm(message, { title = 'Konfirmasi', checkboxLabel = '' } = {}) {
     })
 }
 
+// Dialog dengan input teks bebas. Resolve dengan string yang diisi user, atau null jika dibatalkan.
+function $prompt(message, { title = 'Konfirmasi', inputLabel = '', inputPlaceholder = '', defaultValue = '' } = {}) {
+    return new Promise((resolve) => {
+        Object.assign(state, {
+            visible: true,
+            type: 'prompt',
+            title,
+            message,
+            inputLabel,
+            inputPlaceholder,
+            inputValue: defaultValue,
+            resolve,
+        })
+    })
+}
+
 function close(result) {
     state.visible = false
     state.resolve?.(result)
@@ -28,5 +47,5 @@ function close(result) {
 }
 
 export function useDialog() {
-    return { state, $alert, $confirm, close }
+    return { state, $alert, $confirm, $prompt, close }
 }

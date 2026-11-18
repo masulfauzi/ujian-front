@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { clearToken, clearUserName, decodeToken, getToken, getUserName, setToken, setUserName } from '../services/token'
-import { registerUser, loginUser } from '../services/authService'
+import { registerUser, loginUser, loginWithSsoCode } from '../services/authService'
 
 export const useAuthStore = defineStore('auth', {
     state: () => {
@@ -70,6 +70,26 @@ export const useAuthStore = defineStore('auth', {
                 throw new Error(response.message || 'Login failed')
             } catch (err) {
                 this.error = err.response?.data?.message || err.message || 'Login error'
+                throw err
+            } finally {
+                this.isLoading = false
+            }
+        },
+
+        async loginWithSso(code) {
+            this.logout() // pastikan akun sebelumnya tidak tertinggal
+            this.isLoading = true
+            this.error = null
+
+            try {
+                const response = await loginWithSsoCode(code)
+                if (response.success && response.data?.token) {
+                    this.applyToken(response.data.token, response.data.name)
+                    return response
+                }
+                throw new Error(response.message || 'Login otomatis gagal')
+            } catch (err) {
+                this.error = err.response?.data?.message || err.message || 'Login otomatis gagal'
                 throw err
             } finally {
                 this.isLoading = false

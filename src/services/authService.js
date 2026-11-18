@@ -21,3 +21,8 @@ export const loginUser = async (credentials) => {
 export const logoutUser = () => {
     return api.post('/auth/logout')
 }
+
+export const loginWithSsoCode = async (code) => {
+    const response = await api.post('/auth/sso', { code })
+    return response.data
+}

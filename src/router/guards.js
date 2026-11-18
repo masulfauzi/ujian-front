@@ -7,6 +7,12 @@ import { useAuthStore } from '@/stores/auth'
  */
 export function setupAuthGuards(router) {
     router.beforeEach((to, from, next) => {
+        // /sso selalu boleh diakses; halaman itu sendiri yang mengatur redirect
+        if (to.path === '/sso') {
+            next()
+            return
+        }
+
         const authStore = useAuthStore()
 
         // Public routes (accessible without authentication)

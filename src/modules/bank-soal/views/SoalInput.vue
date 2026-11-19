@@ -56,6 +56,34 @@
 
         <!-- Form Section -->
         <form @submit.prevent="handleSave" class="bg-white rounded-lg shadow border border-slate-200 p-6 space-y-6">
+          <!-- Jenis Soal -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-900 mb-2">
+              Jenis Soal
+            </label>
+            <div class="flex gap-2 flex-wrap">
+              <button
+                v-for="jenis in JENIS_SOAL"
+                :key="jenis.value"
+                type="button"
+                @click="changeJenis(jenis.value)"
+                :class="[
+                  'px-4 py-2 rounded-lg border text-sm font-semibold transition-colors',
+                  currentForm.jenis === jenis.value
+                    ? 'bg-sky-600 border-sky-600 text-white'
+                    : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+                ]">
+                {{ jenis.label }}
+              </button>
+            </div>
+            <p v-if="currentForm.jenis === 'pgk'" class="text-xs text-slate-500 mt-2">
+              Kunci minimal 2 opsi. Peserta mendapat poin hanya jika jawabannya sama persis dengan kunci.
+            </p>
+            <p v-else-if="currentForm.jenis === 'bs'" class="text-xs text-slate-500 mt-2">
+              Isi 3 pernyataan, lalu tentukan Benar/Salah untuk masing-masing.
+            </p>
+          </div>
+
           <!-- Soal Text with Quill Editor -->
           <div>
             <label class="block text-sm font-semibold text-slate-900 mb-2">
@@ -99,17 +127,17 @@
 
           <!-- Opsi Jawaban Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div v-for="opsiKey in ['opsi_a', 'opsi_b', 'opsi_c', 'opsi_d', 'opsi_e']" :key="opsiKey">
+            <div v-for="opsiKey in visibleOpsiKeys" :key="opsiKey">
               <!-- Opsi Text -->
               <div>
                 <label class="block text-sm font-semibold text-slate-900 mb-2">
-                  Opsi {{ opsiKey.split('_')[1].toUpperCase() }}
+                  {{ opsiLabel(opsiKey) }}
                 </label>
                 <input
                   v-model="currentForm[opsiKey]"
                   @blur="validateField(opsiKey)"
                   type="text"
-                  :placeholder="`Ketik opsi ${opsiKey.split('_')[1].toUpperCase()}...`"
+                  :placeholder="`Ketik ${opsiLabel(opsiKey).toLowerCase()}...`"
                   class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
                   :class="{ 'border-red-500 focus:ring-red-500': errors[opsiKey] }">
                 <p v-if="errors[opsiKey]" class="text-red-600 text-sm mt-1">{{ errors[opsiKey] }}</p>
@@ -118,7 +146,7 @@
               <!-- Opsi Image -->
               <div class="mt-3">
                 <label class="block text-sm font-medium text-slate-700 mb-2">
-                  Gambar Opsi {{ opsiKey.split('_')[1].toUpperCase() }} (Opsional)
+                  Gambar {{ opsiLabel(opsiKey) }} (Opsional)
                 </label>
                 <div
                   @drop.prevent="handleDrop($event, `gambar_${opsiKey.split('_')[1]}`)"
@@ -151,8 +179,9 @@
             <label class="block text-sm font-semibold text-slate-900 mb-3">
               Kunci Jawaban <span class="text-red-600">*</span>
             </label>
-            <div class="flex gap-4 flex-wrap">
-              <label v-for="opsi in ['A', 'B', 'C', 'D', 'E']" :key="opsi" class="flex items-center gap-2 cursor-pointer">
+            <!-- Pilihan Ganda: satu kunci -->
+            <div v-if="currentForm.jenis === 'pg'" class="flex gap-4 flex-wrap">
+              <label v-for="opsi in OPSI_HURUF" :key="opsi" class="flex items-center gap-2 cursor-pointer">
                 <input
                   v-model="currentForm.kunci"
                   type="radio"
@@ -160,6 +189,34 @@
                   class="w-4 h-4">
                 <span class="text-slate-700 font-medium">{{ opsi }}</span>
               </label>
+            </div>
+
+            <!-- Pilihan Ganda Kompleks: beberapa kunci -->
+            <div v-else-if="currentForm.jenis === 'pgk'" class="flex gap-4 flex-wrap">
+              <label v-for="opsi in OPSI_HURUF" :key="opsi" class="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  :checked="(currentForm.kunci || '').includes(opsi)"
+                  @change="currentForm.kunci = toggleHuruf(currentForm.kunci, opsi)"
+                  class="w-4 h-4">
+                <span class="text-slate-700 font-medium">{{ opsi }}</span>
+              </label>
+            </div>
+
+            <!-- Benar/Salah: B/S per pernyataan -->
+            <div v-else class="space-y-2">
+              <div v-for="(_, idx) in 3" :key="idx" class="flex items-center gap-4">
+                <span class="w-28 text-slate-700 font-medium">Pernyataan {{ idx + 1 }}</span>
+                <label v-for="bs in [{ value: 'B', label: 'Benar' }, { value: 'S', label: 'Salah' }]" :key="bs.value" class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    :name="`kunci-bs-${idx}`"
+                    :checked="(currentForm.kunci || '')[idx] === bs.value"
+                    @change="setKunciBs(idx, bs.value)"
+                    class="w-4 h-4">
+                  <span class="text-slate-700">{{ bs.label }}</span>
+                </label>
+              </div>
             </div>
             <p v-if="errors.kunci" class="text-red-600 text-sm mt-2">{{ errors.kunci }}</p>
           </div>
@@ -228,6 +285,7 @@ import { useSoalStore } from '@/stores/soal'
 import { soalService } from '@/services/soalService'
 import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
+import { JENIS_SOAL, OPSI_HURUF, toggleHuruf } from '@/utils/jenisSoal'
 import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
 
@@ -258,6 +316,31 @@ const currentForm = computed({
 const errors = reactive({
   kunci: ''
 })
+
+const OPSI_KEYS = ['opsi_a', 'opsi_b', 'opsi_c', 'opsi_d', 'opsi_e']
+
+// Soal benar/salah hanya memakai 3 pernyataan (opsi_a..opsi_c)
+const visibleOpsiKeys = computed(() =>
+  currentForm.value.jenis === 'bs' ? OPSI_KEYS.slice(0, 3) : OPSI_KEYS
+)
+
+const opsiLabel = (opsiKey) => {
+  const idx = OPSI_KEYS.indexOf(opsiKey)
+  return currentForm.value.jenis === 'bs' ? `Pernyataan ${idx + 1}` : `Opsi ${OPSI_HURUF[idx]}`
+}
+
+const changeJenis = (jenis) => {
+  if (currentForm.value.jenis === jenis) return
+  currentForm.value.jenis = jenis
+  currentForm.value.kunci = ''
+  errors.kunci = ''
+}
+
+const setKunciBs = (index, value) => {
+  const chars = (currentForm.value.kunci || '').padEnd(3, ' ').slice(0, 3).split('')
+  chars[index] = value
+  currentForm.value.kunci = chars.join('')
+}
 
 onMounted(async () => {
   try {
@@ -295,6 +378,7 @@ onMounted(async () => {
             gambar_c: soal.gambar_c || null,
             gambar_d: soal.gambar_d || null,
             gambar_e: soal.gambar_e || null,
+            jenis: soal.jenis || 'pg',
             kunci: soal.kunci || ''
           }
 
@@ -328,6 +412,7 @@ const getEmptyForm = () => ({
   gambar_c: null,
   gambar_d: null,
   gambar_e: null,
+  jenis: 'pg',
   kunci: ''
 })
 
@@ -360,9 +445,33 @@ const initializeQuill = async () => {
   }
 }
 
+// Opsi dianggap terisi jika ada teks atau gambar (sama seperti validasi backend)
+const isOpsiTerisi = (index) => {
+  const huruf = OPSI_HURUF[index].toLowerCase()
+  const form = currentForm.value
+  return !!(form[`opsi_${huruf}`] || '').trim() || !!form[`gambar_${huruf}`]
+}
+
+const validateKunci = () => {
+  const { jenis, kunci = '' } = currentForm.value
+
+  if (jenis === 'pgk') {
+    if (kunci.length < 2) return 'Pilih minimal 2 kunci jawaban'
+    const kosong = kunci.split('').find((h) => !isOpsiTerisi(OPSI_HURUF.indexOf(h)))
+    return kosong ? `Opsi ${kosong} yang dipilih sebagai kunci tidak boleh kosong` : ''
+  }
+
+  if (jenis === 'bs') {
+    if (![0, 1, 2].every(isOpsiTerisi)) return 'Pernyataan 1, 2, dan 3 wajib diisi'
+    return /^[BS]{3}$/.test(kunci) ? '' : 'Tentukan Benar/Salah untuk ketiga pernyataan'
+  }
+
+  return kunci ? '' : 'Kunci Jawaban wajib dipilih'
+}
+
 const validateField = (field) => {
   if (field !== 'kunci') return
-  errors.kunci = currentForm.value.kunci ? '' : 'Kunci Jawaban wajib dipilih'
+  errors.kunci = validateKunci()
 }
 
 const validateForm = () => {
@@ -435,6 +544,37 @@ const isSoalFilled = (soalNum) => {
   return isFilled
 }
 
+const buildFormData = () => {
+  const form = currentForm.value
+  const isBs = form.jenis === 'bs'
+  const formData = new FormData()
+
+  // Append soal data
+  formData.append('id_bank_soal', bankSoalId)
+  formData.append('no_soal', currentSoalNumber.value)
+  formData.append('soal', form.soal || '')
+  formData.append('jenis', form.jenis || 'pg')
+  formData.append('opsi_a', form.opsi_a || '')
+  formData.append('opsi_b', form.opsi_b || '')
+  formData.append('opsi_c', form.opsi_c || '')
+  // Soal benar/salah tidak memakai opsi D & E
+  formData.append('opsi_d', isBs ? '' : form.opsi_d || '')
+  formData.append('opsi_e', isBs ? '' : form.opsi_e || '')
+  formData.append('kunci', form.kunci || '')
+
+  // Append files if they exist and are File objects
+  const imageFields = isBs
+    ? ['gambar_soal', 'gambar_a', 'gambar_b', 'gambar_c']
+    : ['gambar_soal', 'gambar_a', 'gambar_b', 'gambar_c', 'gambar_d', 'gambar_e']
+  imageFields.forEach(field => {
+    if (form[field] instanceof File) {
+      formData.append(field, form[field])
+    }
+  })
+
+  return formData
+}
+
 const handleSave = async () => {
   if (!validateForm()) {
     saveStatus.value = {
@@ -450,26 +590,7 @@ const handleSave = async () => {
   isSaving.value = true
 
   try {
-    const formData = new FormData()
-
-    // Append soal data
-    formData.append('id_bank_soal', bankSoalId)
-    formData.append('no_soal', currentSoalNumber.value)
-    formData.append('soal', currentForm.value.soal || '')
-    formData.append('opsi_a', currentForm.value.opsi_a || '')
-    formData.append('opsi_b', currentForm.value.opsi_b || '')
-    formData.append('opsi_c', currentForm.value.opsi_c || '')
-    formData.append('opsi_d', currentForm.value.opsi_d || '')
-    formData.append('opsi_e', currentForm.value.opsi_e || '')
-    formData.append('kunci', currentForm.value.kunci || '')
-
-    // Append files if they exist and are File objects
-    const imageFields = ['gambar_soal', 'gambar_a', 'gambar_b', 'gambar_c', 'gambar_d', 'gambar_e']
-    imageFields.forEach(field => {
-      if (currentForm.value[field] instanceof File) {
-        formData.append(field, currentForm.value[field])
-      }
-    })
+    const formData = buildFormData()
 
     let savedId = currentForm.value.id
     if (currentForm.value.id) {
@@ -519,26 +640,7 @@ const handleSaveAndNext = async () => {
   isSaving.value = true
 
   try {
-    const formData = new FormData()
-
-    // Append soal data
-    formData.append('id_bank_soal', bankSoalId)
-    formData.append('no_soal', currentSoalNumber.value)
-    formData.append('soal', currentForm.value.soal || '')
-    formData.append('opsi_a', currentForm.value.opsi_a || '')
-    formData.append('opsi_b', currentForm.value.opsi_b || '')
-    formData.append('opsi_c', currentForm.value.opsi_c || '')
-    formData.append('opsi_d', currentForm.value.opsi_d || '')
-    formData.append('opsi_e', currentForm.value.opsi_e || '')
-    formData.append('kunci', currentForm.value.kunci || '')
-
-    // Append files if they exist and are File objects
-    const imageFields = ['gambar_soal', 'gambar_a', 'gambar_b', 'gambar_c', 'gambar_d', 'gambar_e']
-    imageFields.forEach(field => {
-      if (currentForm.value[field] instanceof File) {
-        formData.append(field, currentForm.value[field])
-      }
-    })
+    const formData = buildFormData()
 
     let savedId = currentForm.value.id
     if (currentForm.value.id) {

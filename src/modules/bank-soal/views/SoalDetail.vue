@@ -98,8 +98,9 @@
             <div v-else class="space-y-4">
               <div v-for="(soal, index) in sortedSoals" :key="soal.id" class="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors">
                 <!-- Soal Number -->
-                <div class="text-sm font-semibold text-slate-600 mb-2">
+                <div class="flex items-center gap-2 text-sm font-semibold text-slate-600 mb-2">
                   Soal {{ soal.no_soal }}
+                  <span class="bg-sky-50 text-sky-700 px-2 py-0.5 rounded-full text-xs font-semibold">{{ jenisLabel(soal.jenis) }}</span>
                 </div>
 
                 <!-- Pertanyaan -->
@@ -108,69 +109,34 @@
                   <img v-if="isImageAvailable(soal.gambar_soal)" :src="soal.gambar_soal" :alt="`Gambar soal ${index + 1}`" class="mt-2 w-auto h-auto min-h-[100px] max-h-96 rounded-lg border border-slate-200">
                 </div>
 
-                <!-- Opsi Jawaban Section -->
+                <!-- Opsi Jawaban / Pernyataan Section -->
                 <div class="mt-4">
-                  <p class="text-sm font-semibold text-slate-700 mb-3">Opsi Jawaban:</p>
+                  <p class="text-sm font-semibold text-slate-700 mb-3">{{ soal.jenis === 'bs' ? 'Pernyataan:' : 'Opsi Jawaban:' }}</p>
                   <div class="space-y-2 ml-2">
-                    <!-- Opsi A -->
-                    <div v-if="soal.opsi_a" class="flex gap-3 pb-3 border-b border-slate-100">
-                      <div class="flex-shrink-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">A</span>
+                    <template v-for="(huruf, opsiIndex) in opsiHurufFor(soal)" :key="huruf">
+                      <div v-if="soal[`opsi_${huruf.toLowerCase()}`] || isImageAvailable(soal[`gambar_${huruf.toLowerCase()}`])" class="flex gap-3 pb-3 border-b border-slate-100 last:border-b-0">
+                        <div class="flex-shrink-0">
+                          <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">
+                            {{ soal.jenis === 'bs' ? opsiIndex + 1 : huruf }}
+                          </span>
+                        </div>
+                        <div class="flex-1">
+                          <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal[`opsi_${huruf.toLowerCase()}`]"></div>
+                          <img v-if="isImageAvailable(soal[`gambar_${huruf.toLowerCase()}`])" :src="soal[`gambar_${huruf.toLowerCase()}`]" :alt="soal.jenis === 'bs' ? `Pernyataan ${opsiIndex + 1}` : `Opsi ${huruf}`" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
+                        </div>
+                        <template v-if="soal.jenis === 'bs'">
+                          <span
+                            v-if="soal.kunci?.[opsiIndex]"
+                            :class="[
+                              'text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit',
+                              soal.kunci[opsiIndex] === 'B' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            ]">
+                            {{ soal.kunci[opsiIndex] === 'B' ? 'Benar' : 'Salah' }}
+                          </span>
+                        </template>
+                        <span v-else-if="soal.kunci?.includes(huruf)" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
                       </div>
-                      <div class="flex-1">
-                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_a"></div>
-                        <img v-if="isImageAvailable(soal.gambar_a)" :src="soal.gambar_a" :alt="'Opsi A'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
-                      </div>
-                      <span v-if="soal.kunci === 'A'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
-                    </div>
-
-                    <!-- Opsi B -->
-                    <div v-if="soal.opsi_b" class="flex gap-3 pb-3 border-b border-slate-100">
-                      <div class="flex-shrink-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">B</span>
-                      </div>
-                      <div class="flex-1">
-                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_b"></div>
-                        <img v-if="isImageAvailable(soal.gambar_b)" :src="soal.gambar_b" :alt="'Opsi B'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
-                      </div>
-                      <span v-if="soal.kunci === 'B'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
-                    </div>
-
-                    <!-- Opsi C -->
-                    <div v-if="soal.opsi_c" class="flex gap-3 pb-3 border-b border-slate-100">
-                      <div class="flex-shrink-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">C</span>
-                      </div>
-                      <div class="flex-1">
-                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_c"></div>
-                        <img v-if="isImageAvailable(soal.gambar_c)" :src="soal.gambar_c" :alt="'Opsi C'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
-                      </div>
-                      <span v-if="soal.kunci === 'C'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
-                    </div>
-
-                    <!-- Opsi D -->
-                    <div v-if="soal.opsi_d" class="flex gap-3 pb-3 border-b border-slate-100">
-                      <div class="flex-shrink-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">D</span>
-                      </div>
-                      <div class="flex-1">
-                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_d"></div>
-                        <img v-if="isImageAvailable(soal.gambar_d)" :src="soal.gambar_d" :alt="'Opsi D'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
-                      </div>
-                      <span v-if="soal.kunci === 'D'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
-                    </div>
-
-                    <!-- Opsi E -->
-                    <div v-if="soal.opsi_e" class="flex gap-3">
-                      <div class="flex-shrink-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-semibold text-sm">E</span>
-                      </div>
-                      <div class="flex-1">
-                        <div class="text-slate-700 prose prose-sm max-w-none" v-html="soal.opsi_e"></div>
-                        <img v-if="isImageAvailable(soal.gambar_e)" :src="soal.gambar_e" :alt="'Opsi E'" class="mt-2 w-auto h-auto min-h-[100px] max-h-64 rounded-lg border border-slate-200">
-                      </div>
-                      <span v-if="soal.kunci === 'E'" class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap h-fit">✓ Kunci</span>
-                    </div>
+                    </template>
                   </div>
                 </div>
 
@@ -178,7 +144,7 @@
                 <div class="mt-4 pt-3 border-t border-slate-200">
                   <div class="bg-green-50 border border-green-200 rounded-lg p-3">
                     <span class="font-semibold text-green-700">Kunci Jawaban:</span>
-                    <span class="text-green-700 ml-2 font-bold text-lg">{{ soal.kunci }}</span>
+                    <span class="text-green-700 ml-2 font-bold text-lg">{{ formatKunci(soal) }}</span>
                   </div>
                 </div>
               </div>
@@ -261,6 +227,7 @@ import { useMapelStore } from '@/stores/mapel'
 import { useSoalStore } from '@/stores/soal'
 import { soalService } from '@/services/soalService'
 import { downloadBlob, extractBlobErrorMessage } from '@/utils/download'
+import { OPSI_HURUF, jenisLabel } from '@/utils/jenisSoal'
 
 const route = useRoute()
 const router = useRouter()
@@ -426,6 +393,17 @@ const getOpsiLabel = (index) => {
 
 const isImageAvailable = (imagePath) => {
   return imagePath && typeof imagePath === 'string' && imagePath.trim().length > 0
+}
+
+// Soal benar/salah hanya memakai pernyataan di opsi_a..opsi_c
+const opsiHurufFor = (soal) => (soal.jenis === 'bs' ? OPSI_HURUF.slice(0, 3) : OPSI_HURUF)
+
+const formatKunci = (soal) => {
+  if (soal.jenis !== 'bs') return soal.kunci || '-'
+  return (soal.kunci || '')
+    .split('')
+    .map((k, i) => `${i + 1}: ${k === 'B' ? 'Benar' : 'Salah'}`)
+    .join(', ') || '-'
 }
 
 const decodeHtmlEntities = (html) => {

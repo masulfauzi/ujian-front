@@ -180,32 +180,75 @@
                                     />
                                 </div>
 
-                                <!-- Pilihan Jawaban -->
-                                <div class="space-y-3 mb-8">
+                                <!-- Pilihan Jawaban: Benar/Salah (3 pernyataan) -->
+                                <div v-if="currentQuestion.jenis === 'bs'" class="space-y-3 mb-8">
+                                    <p class="text-xs text-slate-500">Tentukan Benar atau Salah untuk setiap pernyataan. Jawaban tersimpan setelah ketiga pernyataan terisi.</p>
+                                    <div
+                                        v-for="(huruf, idx) in ['A', 'B', 'C']"
+                                        :key="huruf"
+                                        class="p-4 rounded-2xl border-2 border-slate-200 flex flex-col md:flex-row md:items-center gap-3">
+                                        <div class="flex items-start gap-3 flex-1">
+                                            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-1">{{ idx + 1 }}</span>
+                                            <div class="flex-1">
+                                                <div class="text-slate-700 text-sm prose prose-sm max-w-none" v-html="currentQuestion[`opsi_${huruf.toLowerCase()}`] || '-'"></div>
+                                                <img
+                                                    v-if="currentQuestion[`gambar_${huruf.toLowerCase()}`]"
+                                                    :src="currentQuestion[`gambar_${huruf.toLowerCase()}`]"
+                                                    :alt="`Gambar pernyataan ${idx + 1}`"
+                                                    class="mt-2 max-h-40 w-auto rounded-lg border border-slate-100 object-contain"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2 flex-shrink-0">
+                                            <button
+                                                v-for="bs in [{ value: 'B', label: 'Benar' }, { value: 'S', label: 'Salah' }]"
+                                                :key="bs.value"
+                                                type="button"
+                                                @click="selectBs(idx, bs.value)"
+                                                :class="[
+                                                    'px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all',
+                                                    bsDraft[currentQuestion.id]?.[idx] === bs.value
+                                                        ? (bs.value === 'B' ? 'border-green-500 bg-green-50 text-green-700' : 'border-red-500 bg-red-50 text-red-700')
+                                                        : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                                                ]">
+                                                {{ bs.label }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <span
+                                        v-if="savingAnswers[currentQuestion.id]"
+                                        class="inline-block w-3 h-3 border-2 border-slate-300 border-t-primary rounded-full animate-spin"
+                                    ></span>
+                                </div>
+
+                                <!-- Pilihan Jawaban: Pilihan Ganda / Pilihan Ganda Kompleks -->
+                                <div v-else class="space-y-3 mb-8">
+                                    <p v-if="currentQuestion.jenis === 'pgk'" class="text-xs text-slate-500">Pilih satu atau lebih jawaban yang benar.</p>
                                     <div
                                         v-for="option in ['A', 'B', 'C', 'D', 'E']"
                                         :key="option"
                                         @click="selectAnswer(option)"
                                         :class="[
                                             'p-4 rounded-2xl border-2 cursor-pointer transition-all',
-                                            selectedAnswers[currentQuestion.id] === option
+                                            isOptionSelected(option)
                                                 ? 'border-primary bg-primary/5'
                                                 : 'border-slate-200 hover:border-slate-300'
                                         ]">
                                         <div class="flex items-start gap-3">
                                             <div :class="[
-                                                'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1',
-                                                selectedAnswers[currentQuestion.id] === option
+                                                'w-6 h-6 border-2 flex items-center justify-center flex-shrink-0 mt-1',
+                                                currentQuestion.jenis === 'pgk' ? 'rounded-md' : 'rounded-full',
+                                                isOptionSelected(option)
                                                     ? 'border-primary bg-primary text-white'
                                                     : 'border-slate-300'
                                             ]">
-                                                <span v-if="selectedAnswers[currentQuestion.id] === option" class="material-symbols-outlined text-[14px]">check</span>
+                                                <span v-if="isOptionSelected(option)" class="material-symbols-outlined text-[14px]">check</span>
                                             </div>
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-2">
                                                     <div class="text-slate-700 text-sm prose prose-sm max-w-none" v-html="currentQuestion[`opsi_${option.toLowerCase()}`] || '-'"></div>
                                                     <span
-                                                        v-if="savingAnswers[currentQuestion.id] && selectedAnswers[currentQuestion.id] === option"
+                                                        v-if="savingAnswers[currentQuestion.id] && isOptionSelected(option)"
                                                         class="inline-block w-3 h-3 border-2 border-slate-300 border-t-primary rounded-full animate-spin"
                                                     ></span>
                                                 </div>
@@ -530,6 +573,7 @@ import { nilaiService } from '@/services/nilaiService'
 import { soalService } from '@/services/soalService'
 import { jadwalService } from '@/services/jadwalService'
 import { sectionService } from '@/services/sectionService'
+import { toggleHuruf } from '@/utils/jenisSoal'
 
 const route = useRoute()
 const router = useRouter()
@@ -547,6 +591,7 @@ const isSubmitting = ref(false)
 const timeRemaining = ref(0)
 const timerInterval = ref(null)
 const savingAnswers = ref({})
+const bsDraft = ref({}) // Map: id_soal -> ['B'|'S'|'', x3], draft soal benar/salah sebelum lengkap
 const saveError = ref(null)
 const showSoalModal = ref(false)
 const isLoggingOut = ref(false)
@@ -626,10 +671,42 @@ function formatCountdown(seconds) {
     return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
 }
 
-async function selectAnswer(option) {
+function isOptionSelected(option) {
+    const answer = selectedAnswers.value[currentQuestion.value?.id] || ''
+    return currentQuestion.value?.jenis === 'pgk' ? answer.includes(option) : answer === option
+}
+
+// Klik opsi untuk soal pg (ganti pilihan) atau pgk (toggle pilihan)
+function selectAnswer(option) {
     if (!currentQuestion.value) return
     const soalId = currentQuestion.value.id
 
+    if (currentQuestion.value.jenis !== 'pgk') {
+        saveJawaban(soalId, option)
+        return
+    }
+
+    const next = toggleHuruf(selectedAnswers.value[soalId], option)
+    // Server menolak jawaban pgk kosong, jadi pilihan terakhir tidak bisa dihapus
+    if (!next) return
+    saveJawaban(soalId, next)
+}
+
+// Pilih Benar/Salah untuk satu pernyataan; jawaban baru dikirim setelah ketiganya terisi
+function selectBs(index, value) {
+    if (!currentQuestion.value) return
+    const soalId = currentQuestion.value.id
+
+    const draft = [...(bsDraft.value[soalId] || ['', '', ''])]
+    draft[index] = value
+    bsDraft.value[soalId] = draft
+
+    if (draft.every(Boolean)) {
+        saveJawaban(soalId, draft.join(''))
+    }
+}
+
+async function saveJawaban(soalId, option) {
     // Update UI dulu (optimistic update)
     selectedAnswers.value[soalId] = option
 
@@ -762,18 +839,21 @@ async function enrichAndTransformQuestions(data) {
         id: item.id_soal,
         no_soal: item.no_soal,
         no_urut: item.no_urut,
+        jenis: item.jenis || item.soalDetail?.jenis || 'pg',
         pertanyaan: item.soalDetail?.soal || item.soal,
-        opsi_a: item.soalDetail?.opsi_a || item.opsi_a || '',
-        opsi_b: item.soalDetail?.opsi_b || item.opsi_b || '',
-        opsi_c: item.soalDetail?.opsi_c || item.opsi_c || '',
-        opsi_d: item.soalDetail?.opsi_d || item.opsi_d || '',
-        opsi_e: item.soalDetail?.opsi_e || item.opsi_e || '',
+        // Opsi diambil dari respons jawaban lebih dulu: jika acak_opsi aktif, server sudah mengacaknya
+        // per peserta dan menilai jawaban berdasarkan posisi tampilan tersebut.
+        opsi_a: item.opsi_a ?? item.soalDetail?.opsi_a ?? '',
+        opsi_b: item.opsi_b ?? item.soalDetail?.opsi_b ?? '',
+        opsi_c: item.opsi_c ?? item.soalDetail?.opsi_c ?? '',
+        opsi_d: item.opsi_d ?? item.soalDetail?.opsi_d ?? '',
+        opsi_e: item.opsi_e ?? item.soalDetail?.opsi_e ?? '',
         gambar_soal: item.soalDetail?.gambar_soal || null,
-        gambar_a: item.soalDetail?.gambar_a || item.gambar_a || null,
-        gambar_b: item.soalDetail?.gambar_b || item.gambar_b || null,
-        gambar_c: item.soalDetail?.gambar_c || item.gambar_c || null,
-        gambar_d: item.soalDetail?.gambar_d || item.gambar_d || null,
-        gambar_e: item.soalDetail?.gambar_e || item.gambar_e || null,
+        gambar_a: item.gambar_a ?? item.soalDetail?.gambar_a ?? null,
+        gambar_b: item.gambar_b ?? item.soalDetail?.gambar_b ?? null,
+        gambar_c: item.gambar_c ?? item.soalDetail?.gambar_c ?? null,
+        gambar_d: item.gambar_d ?? item.soalDetail?.gambar_d ?? null,
+        gambar_e: item.gambar_e ?? item.soalDetail?.gambar_e ?? null,
     }))
 }
 
@@ -781,6 +861,9 @@ function mergeAnswerRecords(data) {
     data.forEach(item => {
         if (item.jawaban) {
             selectedAnswers.value[item.id_soal] = item.jawaban
+            if (item.jenis === 'bs') {
+                bsDraft.value[item.id_soal] = item.jawaban.split('')
+            }
         }
         jawabanRecords.value[item.id_soal] = {
             id: item.id,

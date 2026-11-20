@@ -127,6 +127,15 @@
                 <span class="material-symbols-outlined">grade</span>
                 <span class="font-label-md text-label-md">Nilai</span>
             </router-link>
+            <router-link to="/admin/user" @click="uiStore.closeSidebar()" :class="[
+                'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                isActivePath('/admin/user')
+                    ? 'bg-sky-50 text-sky-600'
+                    : 'text-slate-600 hover:bg-slate-50 transition-all'
+            ]">
+                <span class="material-symbols-outlined">manage_accounts</span>
+                <span class="font-label-md text-label-md">Manajemen User</span>
+            </router-link>
         </nav>
 
 

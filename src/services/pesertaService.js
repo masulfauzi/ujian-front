@@ -5,6 +5,7 @@ export const pesertaService = {
     try {
       const params = { page, page_size: pageSize }
       if (filters.id_kelas) params.id_kelas = filters.id_kelas
+      if (filters.search) params.search = filters.search
       const response = await api.get('/peserta', { params })
       return response.data
     } catch (error) {

@@ -34,18 +34,33 @@
       </div>
 
       <!-- Filter Section -->
-      <div v-if="!isLoading" class="mb-6">
-        <div class="flex items-center gap-4">
+      <div class="mb-6">
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <div class="relative w-full md:w-[28rem] md:flex-none">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input
+              v-model="search"
+              type="text"
+              placeholder="Cari nama, username/NISN, atau kelas..."
+              class="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <button
+              v-if="search"
+              type="button"
+              @click="search = ''"
+              class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+              title="Hapus pencarian">
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
           <select
             v-model="filterKelasId"
             @change="handleFilter"
-            class="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+            class="w-full md:w-56 px-4 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
             <option value="">Semua Kelas</option>
             <option v-for="kelas in kelasStore.kelass" :key="kelas.id" :value="kelas.id">
               {{ kelas.nama_kelas }}
             </option>
           </select>
-          <span class="text-slate-500 text-sm">Pilih kelas untuk memfilter data</span>
         </div>
       </div>
 
@@ -59,7 +74,12 @@
 
       <!-- Table Section -->
       <div v-else class="bg-white rounded-lg shadow border border-slate-200 overflow-hidden">
-        <div v-if="!isLoading && pesertas.length === 0" class="text-center py-12">
+        <div v-if="!isLoading && pesertas.length === 0 && isFiltering" class="text-center py-12">
+          <span class="material-symbols-outlined text-6xl text-slate-300">person_search</span>
+          <p class="text-slate-600 mt-4">Tidak ada peserta yang cocok dengan pencarian atau filter</p>
+        </div>
+
+        <div v-else-if="!isLoading && pesertas.length === 0" class="text-center py-12">
           <span class="material-symbols-outlined text-6xl text-slate-300">inbox</span>
           <p class="text-slate-600 mt-4">Belum ada peserta yang dibuat</p>
           <button
@@ -155,7 +175,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, computed, watch } from 'vue'
 import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import { usePesertaStore } from '@/stores/peserta'
@@ -169,6 +189,18 @@ const router = useRouter()
 const { $confirm } = useDialog()
 const currentPage = ref(1)
 const filterKelasId = ref('')
+const search = ref('')
+
+const currentFilters = () => ({ id_kelas: filterKelasId.value, search: search.value.trim() })
+const isFiltering = computed(() => !!filterKelasId.value || !!search.value.trim())
+
+// Cari ke server setelah user berhenti mengetik
+let searchTimer = null
+watch(search, () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(handleFilter, 400)
+})
+onBeforeUnmount(() => clearTimeout(searchTimer))
 
 onMounted(async () => {
   try {
@@ -215,7 +247,7 @@ const handleDelete = async (id) => {
   if (await $confirm('Yakin ingin menghapus peserta ini?', { title: 'Konfirmasi Hapus' })) {
     try {
       await pesertaStore.deletePeserta(id)
-      await pesertaStore.fetchPesertaList(currentPage.value, pageSize.value, { id_kelas: filterKelasId.value })
+      await pesertaStore.fetchPesertaList(currentPage.value, pageSize.value, currentFilters())
     } catch (err) {
       console.error('Error deleting peserta:', err)
     }
@@ -225,12 +257,12 @@ const handleDelete = async (id) => {
 const handlePageChange = async (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
-    await pesertaStore.fetchPesertaList(page, pageSize.value, { id_kelas: filterKelasId.value })
+    await pesertaStore.fetchPesertaList(page, pageSize.value, currentFilters())
   }
 }
 
 const handleFilter = async () => {
   currentPage.value = 1
-  await pesertaStore.fetchPesertaList(1, pageSize.value, { id_kelas: filterKelasId.value })
+  await pesertaStore.fetchPesertaList(1, pageSize.value, currentFilters())
 }
 </script>

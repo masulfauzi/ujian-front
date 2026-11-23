@@ -131,7 +131,7 @@
                                     <div class="mb-5">
                                         <div class="flex items-center justify-between mb-2">
                                             <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">
-                                                Soal {{ currentQuestionIndex + 1 }} dari {{ totalQuestions }}
+                                                Soal {{ usesSections ? questionNumber(viewingSectionIndex, currentQuestionIndex) : currentQuestionIndex + 1 }} dari {{ usesSections ? globalTotalQuestions : totalQuestions }}
                                             </span>
                                             <div class="flex items-center gap-3 text-xs">
                                                 <span class="flex items-center gap-1 text-slate-500">
@@ -379,7 +379,7 @@
                                                         ? 'bg-secondary-container text-on-secondary-container'
                                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                                 ]">
-                                                {{ q.no_soal ?? (qIdx + 1) }}
+                                                {{ questionNumber(sIdx, qIdx) }}
                                             </button>
                                         </div>
                                         <p v-else class="text-xs text-slate-400 italic px-1">
@@ -491,7 +491,7 @@
                                                             ? 'bg-secondary-container text-on-secondary-container'
                                                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                                     ]">
-                                                    {{ q.no_soal ?? (qIdx + 1) }}
+                                                    {{ questionNumber(sIdx, qIdx) }}
                                                 </button>
                                             </div>
                                             <p v-else class="text-xs text-slate-400 italic px-1">
@@ -639,6 +639,19 @@ const globalTotalQuestions = computed(() => {
     if (!usesSections.value) return totalQuestions.value
     return sections.value.reduce((sum, s) => sum + (s.jml_soal || 0), 0)
 })
+
+// Nomor tampilan soal bersambung antar section (1..N), berdasarkan urutan tampil,
+// bukan no_soal asli bank soal (yang terlihat teracak saat acak soal aktif).
+const sectionStartNumbers = computed(() => {
+    let next = 1
+    return sections.value.map(sec => {
+        const start = next
+        next += sectionQuestionsMap.value[sec.id]?.length ?? (sec.jml_soal || 0)
+        return start
+    })
+})
+const questionNumber = (sIdx, qIdx) => (sectionStartNumbers.value[sIdx] ?? 1) + qIdx
+
 const globalAnsweredCount = computed(() => {
     if (!usesSections.value) return answeredCount.value
     return Object.keys(selectedAnswers.value).length

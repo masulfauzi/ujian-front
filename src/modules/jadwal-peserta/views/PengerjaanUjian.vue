@@ -1023,11 +1023,6 @@ onMounted(async () => {
 
     initializeTimer()
 
-    const el = document.documentElement
-    if (!document.fullscreenElement && typeof el.requestFullscreen === 'function') {
-        el.requestFullscreen().catch(() => {})
-    }
-
     try {
         nilaiData.value = nilai || {}
 
@@ -1073,9 +1068,6 @@ onBeforeUnmount(() => {
     }
     if (sectionCountdownInterval.value) {
         clearInterval(sectionCountdownInterval.value)
-    }
-    if (document.fullscreenElement && typeof document.exitFullscreen === 'function') {
-        document.exitFullscreen().catch(() => {})
     }
 })
 </script>

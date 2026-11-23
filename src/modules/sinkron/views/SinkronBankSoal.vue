@@ -15,7 +15,28 @@
         <p class="text-slate-500 mt-1">Ambil bank soal semester aktif (draft maupun final) beserta soalnya dari Sianida</p>
       </div>
 
+      <!-- Tab -->
+      <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+        <button
+          v-for="tab in tabs"
+          :key="tab.value"
+          type="button"
+          @click="setMode(tab.value)"
+          :class="[
+            'flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors',
+            mode === tab.value
+              ? (tab.value === 'total' ? 'bg-red-600 text-white' : 'bg-sky-600 text-white')
+              : 'text-slate-600 hover:bg-slate-100'
+          ]">
+          <span class="material-symbols-outlined text-lg">{{ tab.icon }}</span>
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <SinkronBankSoalList v-if="mode === 'per-bank'" />
+
       <SinkronFlow
+        v-else
         :konfirmasi-text="KONFIRMASI_SINKRON_BANK_SOAL"
         :request="sinkronService.sinkronBankSoal"
         :confirm-message="confirmMessage"
@@ -60,11 +81,28 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import SideBar from '@/components/SideBar.vue'
 import TopAppBar from '@/components/TopAppBar.vue'
 import SinkronFlow from '../components/SinkronFlow.vue'
 import SinkronBankSoalSummary from '../components/SinkronBankSoalSummary.vue'
+import SinkronBankSoalList from '../components/SinkronBankSoalList.vue'
 import { sinkronService, KONFIRMASI_SINKRON_BANK_SOAL } from '@/services/sinkronService'
+
+const route = useRoute()
+const router = useRouter()
+
+const tabs = [
+  { value: 'per-bank', label: 'Per Bank Soal', icon: 'playlist_add_check' },
+  { value: 'total', label: 'Semua Bank Soal (Reset Total)', icon: 'restart_alt' },
+]
+
+// Tab aktif disimpan di query (?mode=total) agar bisa di-link
+const mode = computed(() => (route.query.mode === 'total' ? 'total' : 'per-bank'))
+const setMode = (value) => {
+  router.replace({ query: { ...route.query, mode: value === 'total' ? 'total' : undefined } })
+}
 
 const formatNum = (n) => (Number(n) || 0).toLocaleString('id-ID')
 

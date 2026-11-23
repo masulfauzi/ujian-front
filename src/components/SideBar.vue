@@ -91,6 +91,15 @@
                 <span class="material-symbols-outlined">database</span>
                 <span class="font-label-md text-label-md">Bank Soal</span>
             </router-link>
+            <router-link to="/admin/sinkron-bank-soal" @click="uiStore.closeSidebar()" :class="[
+                'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
+                isActivePath('/admin/sinkron-bank-soal')
+                    ? 'bg-sky-50 text-sky-600'
+                    : 'text-slate-600 hover:bg-slate-50 transition-all'
+            ]">
+                <span class="material-symbols-outlined">cloud_sync</span>
+                <span class="font-label-md text-label-md">Sinkron Bank Soal</span>
+            </router-link>
             <router-link to="/admin/peserta" @click="uiStore.closeSidebar()" :class="[
                 'flex items-center gap-3 rounded-lg px-4 py-3 font-semibold hover:translate-x-1 duration-200',
                 isActivePath('/admin/peserta')

@@ -11,6 +11,7 @@ import { jadwalPesertaRoutes } from '../modules/jadwal-peserta/routes'
 import { nilaiRoutes } from '../modules/nilai/routes'
 import { ujianTokenRoutes } from '../modules/ujian-token/routes'
 import { userRoutes } from '../modules/user/routes'
+import { sinkronRoutes } from '../modules/sinkron/routes'
 import { setupAuthGuards } from './guards'
 
 const routes = [
@@ -26,6 +27,7 @@ const routes = [
     ...nilaiRoutes,
     ...ujianTokenRoutes,
     ...userRoutes,
+    ...sinkronRoutes,
     ...authRoutes,
     { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
 ]

@@ -34,7 +34,7 @@
       </div>
 
       <!-- Search -->
-      <div class="mb-4 relative max-w-md">
+      <div class="mb-4 relative max-w-[28rem]">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
         <input
           v-model="search"

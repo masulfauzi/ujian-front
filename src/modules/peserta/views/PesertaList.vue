@@ -135,12 +135,12 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="!isLoading && pesertas.length > 0" class="flex items-center justify-between mt-6">
+      <div v-if="!isLoading && pesertas.length > 0" class="flex flex-col md:flex-row md:items-center justify-between gap-3 mt-6">
         <p class="text-slate-600">
           Menampilkan {{ (currentPage - 1) * pageSize + 1 }} hingga
           {{ Math.min(currentPage * pageSize, totalPeserta) }} dari {{ totalPeserta }} peserta
         </p>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <button
             @click="handlePageChange(currentPage - 1)"
             :disabled="currentPage === 1"
@@ -148,22 +148,24 @@
             Sebelumnya
           </button>
           <div class="flex items-center gap-1">
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              @click="handlePageChange(page)"
-              :class="[
-                'px-3 py-2 rounded-lg font-medium transition-colors',
-                page === currentPage
-                  ? 'bg-sky-600 text-white'
-                  : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
-              ]">
-              {{ page }}
-            </button>
+            <template v-for="(item, idx) in pageItems" :key="`${item}-${idx}`">
+              <span v-if="item === ELLIPSIS" class="px-2 py-2 text-slate-400 select-none">…</span>
+              <button
+                v-else
+                @click="handlePageChange(item)"
+                :class="[
+                  'min-w-10 px-3 py-2 rounded-lg font-medium transition-colors',
+                  item === currentPage
+                    ? 'bg-sky-600 text-white'
+                    : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                ]">
+                {{ item }}
+              </button>
+            </template>
           </div>
           <button
             @click="handlePageChange(currentPage + 1)"
-            :disabled="currentPage === totalPages"
+            :disabled="currentPage >= totalPages"
             class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             Berikutnya
           </button>
@@ -182,6 +184,7 @@ import { usePesertaStore } from '@/stores/peserta'
 import { useDialog } from '@/composables/useDialog'
 import { useKelasStore } from '@/stores/kelas'
 import { useRouter } from 'vue-router'
+import { ELLIPSIS, getPageItems } from '@/utils/pagination'
 
 const pesertaStore = usePesertaStore()
 const kelasStore = useKelasStore()
@@ -218,6 +221,7 @@ const success = computed(() => pesertaStore.success)
 const pageSize = computed(() => pesertaStore.pageSize)
 const totalPeserta = computed(() => pesertaStore.totalPeserta)
 const totalPages = computed(() => pesertaStore.totalPages)
+const pageItems = computed(() => getPageItems(currentPage.value, totalPages.value))
 
 watch(success, (newVal) => {
   if (newVal) {
